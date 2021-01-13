@@ -561,3 +561,4 @@ class MyCalendar:
                         if self.is_time:
                             for timestamp in self.list_timespamp:
                                 self.dict_calendar[date_tmp][timestamp] = {}
+
