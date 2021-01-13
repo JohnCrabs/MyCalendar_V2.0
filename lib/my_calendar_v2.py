@@ -27,10 +27,10 @@ list_str_id_months_m = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11',
 list_str_id_months_mm = ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12']
 
 # Create list for days
-list_str_id_single_days_m = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12',
-                             '13', '14', '15', '16', '17', '18', '19', '20', '21', '22', '23', '24',
-                             '25', '26', '27', '28', '29', '30', '31']
-list_str_id_days_mm = ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12',
+list_str_id_days_d = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12',
+                      '13', '14', '15', '16', '17', '18', '19', '20', '21', '22', '23', '24',
+                      '25', '26', '27', '28', '29', '30', '31']
+list_str_id_days_dd = ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12',
                        '13', '14', '15', '16', '17', '18', '19', '20', '21', '22', '23', '24',
                        '25', '26', '27', '28', '29', '30', '31']
 
@@ -79,6 +79,10 @@ M_YY_D = 'myyd'
 YY_M_D = 'yymd'
 YY_D_M = 'yydm'
 
+# Date Formats
+SINGLE = 'single'
+DOUBLE = 'double'
+
 # Different systems to create the hour
 HH_MM = 'hhmm'
 HH_MM_SS = 'hhmmss'
@@ -94,6 +98,7 @@ del_dash = '-'
 del_slash = '/'
 
 NaN = "nan"
+EMPTY_LIST = []
 
 
 def read_csv(csv_path: str, delimeter=del_comma):
@@ -108,7 +113,7 @@ def read_csv(csv_path: str, delimeter=del_comma):
     with open(csv_path) as csv_file:  # open the csv path
         csv_reader = csv.reader(csv_file, delimiter=delimeter)
         for row in csv_reader:  # for each row in csv_reader file
-            list_tmp_csv.append(row)   # append the row to list
+            list_tmp_csv.append(row)  # append the row to list
     return list_tmp_csv  # return the list
 
 
@@ -135,16 +140,27 @@ def write_csv(csv_path: str, list_write: [], delimeter=del_comma):
 
 class MyCalendar:
     def __init__(self, list_of_years: [] = None, is_time: bool = False, date_format=DD_MM_YYYY,
-                 date_delimeter=del_slash):
-        if list_of_years is None:  # if list_of_year is None
+                 date_delimeter=del_slash, time_format=HH_MM, time_delimeter=del_colon,
+                 hour_start=0, hour_end=24, hour_step=1, minute_start=0, minute_end=60, minute_step=0):
+        if list_of_years is None or list_of_years == EMPTY_LIST:  # if list_of_year is None
             list_of_years = [dt.datetime.now().year]  # create a list with only the current year
         self.list_of_years = list_of_years  # set the self.list_of_years
-        self.is_time = is_time  # set the self.is_time
-        self.list_of_is_leap = [self.isLeap(year) for year in list_of_years]  # set list_of_is_leap
+        self.list_of_year_is_leap = [self.isLeap(year) for year in list_of_years]  # set list_of_is_leap
         self.date_format = date_format  # set the date format
         self.date_delimeter = date_delimeter  # set the date delimeter
+
+        self.is_time = is_time  # set the self.is_time
+        self.time_format = time_format  # set the time format
+        self.time_delimeter = time_delimeter  # set the time delimeter
+        self.hour_start = hour_start  # set hour start
+        self.hour_end = hour_end  # set hour end
+        self.hour_step = hour_step  # set hour step
+        self.minute_start = minute_start  # set minute start
+        self.minute_end = minute_end  # set minute end
+        self.minute_step = minute_step  # set minute step
         self.list_timespamp = None  # set the list timestamp
         self.int_list_size = 0  # set the list size to 0
+
         self.dict_calendar = {}  # create the calendar
 
     @staticmethod
@@ -162,7 +178,8 @@ class MyCalendar:
             return False  # is not leap
 
     @staticmethod
-    def set_time(hour_start=0, hour_end=24, hour_step=1, minute_start=0, minute_end=60, minute_step=0):
+    def set_time(hour_start=0, hour_end=24, hour_step=1, minute_start=0, minute_end=60, minute_step=0,
+                 delimeter=del_colon):
         """
         :param hour_start: The starting hour. Range (0, 24)
         :param hour_end: The ending hour. Range (0, 24)
@@ -170,59 +187,65 @@ class MyCalendar:
         :param minute_start: The starting minute. Range (0, 60).
         :param minute_end: The ending minute. Range (0, 60)
         :param minute_step: The minute step. Range (0, 60). Big step means the same minute every hour.
-        :return:
+        :param delimeter: Delimeter for time
+        :return: list_timestamp, int_size
         """
-        if hour_start < 0 or hour_start > 24:
+        if hour_start < 0 or hour_start > 24:  # if hour_start outside original hour ranges
             warnings.warn("Hour start out of range. Set it to default value '0'")
-            hour_start = 0
-        if hour_end < hour_start or hour_end > 24:
+            hour_start = 0  # set hour_start to default value
+        if hour_end < hour_start or hour_end > 24:  # if hour_end outside original hour ranges
             warnings.warn("Hour end out of range. Set it to default value '24'")
-            hour_end = 24
-        if minute_start < 0 or minute_start > 60:
+            hour_end = 24  # set hour_end to default value
+        if minute_start < 0 or minute_start > 60:  # if minute_start outside original minutes ranges
             warnings.warn("Minute start out of range. Set it to default value '0'")
-            minute_start = 0
-        if minute_end < minute_start or minute_end > 60:
+            minute_start = 0  # set minute_start to default value
+        if minute_end < minute_start or minute_end > 60:  # if minute_end outside original minutes ranges
             warnings.warn("Minute end out of range. Set it to default value '60'")
-            minute_end = 60
+            minute_end = 60  # set minute_end to default value
 
-        list_timestamp = []
-        int_size = 0
+        list_timestamp = []  # create list_timestamp
+        int_size = 0  # create an integer to the size of the list_timestamp
 
-        if hour_step <= 0:
-            return None
+        if hour_step <= 0:  # if hour_step less equals to 0 return [], 0
+            return list_timestamp, int_size
         else:
             for hour in range(hour_start, hour_end, hour_step):
-                if minute_step == 0:
-                    timestamp_tmp = str_id_hours[hour] + ':'
-                    timestamp_tmp += str_id_minutes[0]
-                    list_timestamp.append(timestamp_tmp)
+                if minute_step == 0:  # if minute_step is 0
+                    # Create a timestamp_tmp
+                    timestamp_tmp = list_str_id_hours[hour] + delimeter
+                    timestamp_tmp += list_str_id_minutes[0]
+                    list_timestamp.append(timestamp_tmp)  # append to list_timestamp
                     int_size += 1
                     # print(timestamp_tmp)
                 else:
                     for minutes in range(minute_start, minute_end, minute_step):
-                        timestamp_tmp = str_id_hours[hour] + ':'
-                        timestamp_tmp += str_id_minutes[minutes]
-                        list_timestamp.append(timestamp_tmp)
+                        # Create a timestamp_tmp
+                        timestamp_tmp = list_str_id_hours[hour] + delimeter
+                        timestamp_tmp += list_str_id_minutes[minutes]
+                        list_timestamp.append(timestamp_tmp)  # append to list_timestamp
                         int_size += 1
                         # print(timestamp_tmp)
         # print(list_timestamp)
         return list_timestamp, int_size
 
     @staticmethod
-    def change_day_month_to_single_format(day, month):
-        day_single = int(day)
-        day_single = str_id_single_days[day_single - 1]
-        month_single = int(month)
-        month_single = str_id_single_months[month_single - 1]
-        return day_single, month_single
-
-    @staticmethod
-    def change_day_month_to_double_format(day, month):
-        day_double = int(day)
-        day_double = str_id_days[day_double - 1]
-        month_double = int(month)
-        month_double = str_id_months[month_double - 1]
-        return day_double, month_double
+    def change_day_month_format(day, month, date_format=DOUBLE):
+        """
+        For example 01/01/2021 to 1/1/2021
+        :param day: a string of day
+        :param month: a string of month
+        :param date_format: the format needs to transform
+        :return: day_format, month_format
+        """
+        day_format = int(day)  # cast the str to int for day
+        month_format = int(month)  # cast the str to int for month
+        if date_format is SINGLE:
+            day_format = list_str_id_days_d[day_format - 1]  # recasting the int to str for the correct format for day
+            month_format = list_str_id_months_m[month_format - 1]  # cast the str to int for month
+        else:
+            day_format = list_str_id_days_dd[day_format - 1]  # recasting the int to str for the correct format for day
+            month_format = list_str_id_months_mm[month_format - 1]  # cast the str to int for month
+        return day_format, month_format
 
     @staticmethod
     def date_break_to_day_month_year(date: str, date_format: str, date_delimeter=del_slash, century=21):
@@ -260,84 +283,281 @@ class MyCalendar:
                 """
         # DD_MM_YYYY or D_M_YYYY or DD_MM_YY or D_M_YY
         if date_format == DD_MM_YYYY or date_format == D_M_YYYY or date_format == DD_MM_YY or date_format == D_M_YY:
-            day, month, year = date.split(date_delimeter)
+            day, month, year = date.split(date_delimeter)  # split the date using the delimeter
             if date_format == DD_MM_YY or date_format == D_M_YY:
                 year = str(int(year) + (century - 1) * 100)
             return day, month, year
         # DD_YYYY_MM or D_YYYY_M or DD_YY_MM or D_YY_M
         elif date_format == DD_YYYY_MM or date_format == D_YYYY_M or date_format == DD_YY_MM or date_format == D_YY_M:
-            day, year, month = date.split(date_delimeter)
+            day, year, month = date.split(date_delimeter)  # split the date using the delimeter
             if date_format == DD_YY_MM or date_format == D_YY_M:
                 year = str(int(year) + (century - 1) * 100)
             return day, month, year
         # MM_DD_YYYY or M_D_YYYY or MM_DD_YY or M_D_YY
         elif date_format == MM_DD_YYYY or date_format == M_D_YYYY or date_format == MM_DD_YY or date_format == M_D_YY:
-            month, day, year = date.split(date_delimeter)
+            month, day, year = date.split(date_delimeter)  # split the date using the delimeter
             if date_format == MM_DD_YY or date_format == M_D_YY:
                 year = str(int(year) + (century - 1) * 100)
             return day, month, year
         # MM_YYYY_DD or M_YYYY_D or MM_YY_DD or M_YY_D
         elif date_format == MM_YYYY_DD or date_format == M_YYYY_D or date_format == MM_YY_DD or date_format == M_YY_D:
-            month, year, day = date.split(date_delimeter)
+            month, year, day = date.split(date_delimeter)  # split the date using the delimeter
             if date_format == MM_YY_DD or date_format == M_YY_D:
                 year = str(int(year) + (century - 1) * 100)
             return day, month, year
         # YYYY_MM_DD or YYYY_M_D or YY_MM_DD or YY_M_D
         elif date_format == YYYY_MM_DD or date_format == YYYY_M_D or date_format == YY_MM_DD or date_format == YY_M_D:
-            year, month, day = date.split(date_delimeter)
+            year, month, day = date.split(date_delimeter)  # split the date using the delimeter
             if date_format == YY_MM_DD or date_format == YY_M_D:
                 year = str(int(year) + (century - 1) * 100)
             return day, month, year
         # YYYY_DD_MM or YYYY_D_M or YY_DD_MM or YY_D_M
         elif date_format == YYYY_DD_MM or date_format == YYYY_D_M or date_format == YY_DD_MM or date_format == YY_D_M:
-            year, day, month = date.split(date_delimeter)
+            year, day, month = date.split(date_delimeter)  # split the date using the delimeter
             if date_format == YY_DD_MM or date_format == YY_D_M:
                 year = str(int(year) + (century - 1) * 100)
             return day, month, year
 
     @staticmethod
-    def change_hour_number_list_to_time(list_hour: [], date_format=HH_MM):
-        list_hour_tmp = []
-        if date_format == HH_MM:
+    def change_hour_number_list_to_time(list_hour: [], time_format=HH_MM):
+        list_hour_tmp = []  # create tmp hour list
+        if time_format == HH_MM:
             for hour in list_hour:
                 list_hour_tmp.append('%02i' % int(hour) + ':00')
-        elif date_format == HH_MM_SS:
+        elif time_format == HH_MM_SS:
             for hour in list_hour:
                 list_hour_tmp.append('%02i' % int(hour) + ':00:00')
         return list_hour_tmp
 
-    @staticmethod
-    def change_hour_number_in_a_cal_list_to_time(list_event: [], date_format=HH_MM):
+    def change_hour_number_in_a_cal_list_to_time(self, list_event: [], time_index):
+        """
+        In a given list change the time forma to calendar time format
+        :param list_event: the list of events
+        :param time_index: the index of time column in list
+        :return: list_hour
+        """
         list_hour_tmp = []
-        if date_format == HH_MM:
+        if self.time_format == HH_MM:
             for event in list_event:
-                event[1] = '%02i' % int(event[1]) + ':00'
+                event[time_index] = '%02i' % int(event[time_index]) + ':00'
                 list_hour_tmp.append(event)
-        elif date_format == HH_MM_SS:
+        elif self.time_format == HH_MM_SS:
             for event in list_event:
-                event[1] = '%02i' % int(event[1]) + ':00'
+                event[time_index] = '%02i' % int(event[time_index]) + ':00'
                 list_hour_tmp.append(event)
         return list_hour_tmp
 
+    def set_date_format(self, day: str, month: str, year: str, date_format=DD_MM_YYYY, date_delimeter=del_slash):
+        """
+        Check the format of the day (eg DD/MM/YYYY) and returns a string.
+        :param day: The day of the date.
+        :param month: The month of the date.
+        :param year: The year of the date.
+        :param date_format: The date format. Can be: DD_MM_YYYY
+                                                     DD_YYYY_MM
+                                                     MM_DD_YYYY
+                                                     MM_YYYY_DD
+                                                     YYYY_MM_DD
+                                                     YYYY_DD_MM
+                                                     D_M_YYYY
+                                                     D_YYYY_M
+                                                     M_D_YYYY
+                                                     M_YYYY_D
+                                                     YYYY_M_D
+                                                     YYYY_D_M
+                                                     DD_MM_YY
+                                                     DD_YY_MM
+                                                     MM_DD_YY
+                                                     MM_YY_DD
+                                                     YY_MM_DD
+                                                     YY_DD_MM
+                                                     D_M_YY
+                                                     D_YY_M
+                                                     M_D_YY
+                                                     M_YY_D
+                                                     YY_M_D
+                                                     YY_D_M
 
+        :param date_delimeter: The delimeter of the date.
+        :return: A date string.
+        """
+        # DD_MM_YYYY
+        if date_format == DD_MM_YYYY:
+            day, month = self.change_day_month_format(day=day, month=month, date_format=DOUBLE)
+            return day + date_delimeter + month + date_delimeter + year
+        # DD_YYYY_MM
+        elif date_format == DD_YYYY_MM:
+            day, month = self.change_day_month_format(day=day, month=month, date_format=DOUBLE)
+            return day + date_delimeter + year + date_delimeter + month
+        # MM_DD_YYYY
+        elif date_format == MM_DD_YYYY:
+            day, month = self.change_day_month_format(day=day, month=month, date_format=DOUBLE)
+            return month + date_delimeter + day + date_delimeter + year
+        # MM_YYYY_DD
+        elif date_format == MM_YYYY_DD:
+            day, month = self.change_day_month_format(day=day, month=month, date_format=DOUBLE)
+            return month + date_delimeter + year + date_delimeter + day
+        # YYYY_MM_DD
+        elif date_format == YYYY_MM_DD:
+            day, month = self.change_day_month_format(day=day, month=month, date_format=DOUBLE)
+            return year + date_delimeter + month + date_delimeter + day
+        # YYYY_DD_MM
+        elif date_format == YYYY_DD_MM:
+            day, month = self.change_day_month_format(day=day, month=month, date_format=DOUBLE)
+            return year + date_delimeter + day + date_delimeter + month
 
+        # D_M_YYYY
+        elif date_format == D_M_YYYY:
+            day, month = self.change_day_month_format(day=day, month=month, date_format=SINGLE)
+            return day + date_delimeter + month + date_delimeter + year
+        # D_YYYY_M
+        elif date_format == D_YYYY_M:
+            day, month = self.change_day_month_format(day=day, month=month, date_format=SINGLE)
+            return day + date_delimeter + year + date_delimeter + month
+        # M_D_YYYY
+        elif date_format == M_D_YYYY:
+            day, month = self.change_day_month_format(day=day, month=month, date_format=SINGLE)
+            return month + date_delimeter + day + date_delimeter + year
+        # M_YYYY_D
+        elif date_format == M_YYYY_D:
+            day, month = self.change_day_month_format(day=day, month=month, date_format=SINGLE)
+            return month + date_delimeter + year + date_delimeter + day
+        # YYYY_M_D
+        elif date_format == YYYY_M_D:
+            day, month = self.change_day_month_format(day=day, month=month, date_format=SINGLE)
+            return year + date_delimeter + month + date_delimeter + day
+        # YYYY_D_M
+        elif date_format == YYYY_D_M:
+            day, month = self.change_day_month_format(day=day, month=month, date_format=SINGLE)
+            return year + date_delimeter + day + date_delimeter + month
 
+        # DD_MM_YY
+        if date_format == DD_MM_YY:
+            day, month = self.change_day_month_format(day=day, month=month, date_format=DOUBLE)
+            return day + date_delimeter + month + date_delimeter + str(int(year) % 100)
+        # DD_YY_MM
+        elif date_format == DD_YY_MM:
+            day, month = self.change_day_month_format(day=day, month=month, date_format=DOUBLE)
+            return day + date_delimeter + str(int(year) % 100) + date_delimeter + month
+        # MM_DD_YY
+        elif date_format == MM_DD_YY:
+            day, month = self.change_day_month_format(day=day, month=month, date_format=DOUBLE)
+            return month + date_delimeter + day + date_delimeter + str(int(year) % 100)
+        # MM_YY_DD
+        elif date_format == MM_YY_DD:
+            day, month = self.change_day_month_format(day=day, month=month, date_format=DOUBLE)
+            return month + date_delimeter + str(int(year) % 100) + date_delimeter + day
+        # YY_MM_DD
+        elif date_format == YY_MM_DD:
+            day, month = self.change_day_month_format(day=day, month=month, date_format=DOUBLE)
+            return str(int(year) % 100) + date_delimeter + month + date_delimeter + day
+        # YY_DD_MM
+        elif date_format == YY_DD_MM:
+            day, month = self.change_day_month_format(day=day, month=month, date_format=DOUBLE)
+            return str(int(year) % 100) + date_delimeter + day + date_delimeter + month
 
+        # D_M_YY
+        elif date_format == D_M_YY:
+            day, month = self.change_day_month_format(day=day, month=month, date_format=SINGLE)
+            return day + date_delimeter + month + date_delimeter + str(int(year) % 100)
+        # D_YY_M
+        elif date_format == D_YY_M:
+            day, month = self.change_day_month_format(day=day, month=month, date_format=SINGLE)
+            return day + date_delimeter + str(int(year) % 100) + date_delimeter + month
+        # M_D_YY
+        elif date_format == M_D_YY:
+            day, month = self.change_day_month_format(day=day, month=month, date_format=SINGLE)
+            return month + date_delimeter + day + date_delimeter + str(int(year) % 100)
+        # M_YY_D
+        elif date_format == M_YY_D:
+            day, month = self.change_day_month_format(day=day, month=month, date_format=SINGLE)
+            return month + date_delimeter + str(int(year) % 100) + date_delimeter + day
+        # YY_M_D
+        elif date_format == YY_M_D:
+            day, month = self.change_day_month_format(day=day, month=month, date_format=SINGLE)
+            return str(int(year) % 100) + date_delimeter + month + date_delimeter + day
+        # YY_D_M
+        elif date_format == YY_D_M:
+            day, month = self.change_day_month_format(day=day, month=month, date_format=SINGLE)
+            return str(int(year) % 100) + date_delimeter + day + date_delimeter + month
 
+    def change_date_format_in_list(self, list_event: [], date_index, date_format_from: str, date_format_to: str,
+                                   date_delimeter_from=del_slash, date_delimeter_to=del_slash, century=21):
+        list_date_new = []  # list for new dates
+        for event in list_event:  # parsing all events in list
+            day, month, year = self.date_break_to_day_month_year(date=event[date_index], date_format=date_format_from,
+                                                                 date_delimeter=date_delimeter_from, century=century)
 
+            date_tmp = self.set_date_format(day=day, month=month, year=year,
+                                            date_format=date_format_to, date_delimeter=date_delimeter_to)
+            event[date_index] = date_tmp
+            list_date_new.append(event)
 
+        return list_date_new
 
+    def change_date_format_in_a_cal_list(self, list_event: [], date_index, date_format_from: str,
+                                         date_delimeter_from=del_slash, century=21):
+        list_date_new = []  # list for new dates
+        for event in list_event:  # parsing all events in list
+            day, month, year = self.date_break_to_day_month_year(date=event[date_index], date_format=date_format_from,
+                                                                 date_delimeter=date_delimeter_from, century=century)
 
+            date_tmp = self.set_date_format(day=day, month=month, year=year,
+                                            date_format=self.date_format, date_delimeter=self.date_delimeter)
+            event[date_index] = date_tmp
+            list_date_new.append(event)
 
+        return list_date_new
 
+    def print(self):
+        for date_keys in self.dict_calendar.keys():
+            print(date_keys, self.dict_calendar[date_keys])
 
+    def print_date(self):
+        for date_keys in self.dict_calendar.keys():
+            print(date_keys)
 
+    def create(self):
+        """
+        Calendar Creation.
+        :return: Nothing
+        """
+        self.date_format = self.date_format
+        self.date_delimeter = self.date_delimeter
+        list_timestamp, int_list_size = self.set_time(hour_start=self.hour_start,
+                                                      hour_end=self.hour_end,
+                                                      hour_step=self.hour_step,
+                                                      minute_start=self.minute_start,
+                                                      minute_end=self.minute_end,
+                                                      minute_step=self.minute_step)
 
+        self.list_timespamp = list_timestamp
+        self.int_list_size = int_list_size
 
+        for year_index in range(len(self.list_of_years)):
+            # print(self.list_of_years[year_index], self.list_of_year_is_leap[year_index])
 
-
-
-
-
-
-
+            if self.list_of_year_is_leap[year_index]:
+                for month in range(0, 12):
+                    for day in range(0, list_int_month_days_leap[month]):
+                        date_tmp = self.set_date_format(day=list_str_id_days_dd[day],
+                                                        month=list_str_id_months_mm[month],
+                                                        year=str(self.list_of_years[year_index]),
+                                                        date_format=self.date_format,
+                                                        date_delimeter=self.date_delimeter)
+                        self.dict_calendar[date_tmp] = {}
+                        if self.is_time:
+                            for timestamp in self.list_timespamp:
+                                self.dict_calendar[date_tmp][timestamp] = {}
+            else:
+                for month in range(0, 12):
+                    for day in range(0, list_int_month_days_not_leap[month]):
+                        date_tmp = self.set_date_format(day=list_str_id_days_dd[day],
+                                                        month=list_str_id_months_mm[month],
+                                                        year=str(self.list_of_years[year_index]),
+                                                        date_format=self.date_format,
+                                                        date_delimeter=self.date_delimeter)
+                        self.dict_calendar[date_tmp] = {}
+                        if self.is_time:
+                            for timestamp in self.list_timespamp:
+                                self.dict_calendar[date_tmp][timestamp] = {}
