@@ -562,3 +562,15 @@ class MyCalendar:
                             for timestamp in self.list_timespamp:
                                 self.dict_calendar[date_tmp][timestamp] = {}
 
+    def add_list_key_event_to_calendar(self, list_key_event: [], event_type={}):
+        for date_key in self.dict_calendar.keys():
+            if self.is_time:
+                for time_key in self.dict_calendar[date_key]:
+                    for event in list_key_event:
+                        self.dict_calendar[date_key][time_key][event] = event_type
+            else:
+                for event in list_key_event:
+                    self.dict_calendar[date_key][event] = event_type
+
+    def add_events_to_calendar(self, list_of_events: [], first_row_header: bool, ):
+        pass
