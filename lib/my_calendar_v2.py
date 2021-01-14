@@ -572,5 +572,6 @@ class MyCalendar:
                 for event in list_key_event:
                     self.dict_calendar[date_key][event] = event_type
 
+    #
     def add_events_to_calendar(self, list_of_events: [], first_row_header: bool, ):
         pass
