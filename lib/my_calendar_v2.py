@@ -585,8 +585,7 @@ class MyCalendar:
                             self.dict_calendar[date][event][header] = NaN
 
     def add_events_to_calendar(self, list_of_events: [], date_index, time_index, first_row_header: bool,
-                               list_of_headers=None,
-                               event_index=None):
+                               list_of_headers=None, no_data_value=NaN, event_index=None):
         self.event_names = []
         self.header_names = []
         start_index = 0
@@ -612,9 +611,12 @@ class MyCalendar:
                             self.header_names.append(header_name)
                         if event_name not in self.dict_calendar[date].keys():
                             self.dict_calendar[date][event_name] = {}
-                        self.dict_calendar[date][event_name][header_name] = list_of_events[i][j]
+                        if list_of_events[i][j] is '':
+                            self.dict_calendar[date][event_name][header_name] = no_data_value
+                        else:
+                            self.dict_calendar[date][event_name][header_name] = list_of_events[i][j]
 
-    def fill_calendar_with_missing_keys(self):
+    def fill_calendar_with_missing_keys(self, no_data_value=NaN):
         for date in self.dict_calendar.keys():
             if self.is_time:
                 pass
@@ -623,11 +625,11 @@ class MyCalendar:
                     if event not in self.dict_calendar[date].keys():
                         self.dict_calendar[date][event] = {}
                         for header in self.header_names:
-                            self.dict_calendar[date][event][header] = NaN
+                            self.dict_calendar[date][event][header] = no_data_value
                     else:
                         for header in self.header_names:
                             if header not in self.dict_calendar[date][event].keys():
-                                self.dict_calendar[date][event][header] = NaN
+                                self.dict_calendar[date][event][header] = no_data_value
 
     def dict_to_list(self, date_range=None):
         header_list_tmp = []
