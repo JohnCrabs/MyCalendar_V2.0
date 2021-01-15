@@ -99,6 +99,7 @@ del_slash = '/'
 
 NaN = "nan"
 EMPTY_LIST = []
+EMPTY_DICT = {}
 
 
 def read_csv(csv_path: str, delimeter=del_comma):
@@ -161,7 +162,10 @@ class MyCalendar:
         self.list_timespamp = None  # set the list timestamp
         self.int_list_size = 0  # set the list size to 0
 
-        self.dict_calendar = {}  # create the calendar
+        self.dict_calendar = EMPTY_DICT.copy()  # create the calendar
+        self.create(self.dict_calendar)
+        self.event_names = []
+        self.header_names = []
 
     @staticmethod
     def isLeap(year=dt.datetime.now().year):
@@ -509,21 +513,27 @@ class MyCalendar:
 
         return list_date_new
 
-    def print(self):
-        for date_keys in self.dict_calendar.keys():
-            print(date_keys, self.dict_calendar[date_keys])
+    def print(self, print_number=None):
+        if print_number is None:
+            for date_keys in self.dict_calendar.keys():
+                print(date_keys, self.dict_calendar[date_keys])
+        else:
+            break_index = 0
+            for date_keys in self.dict_calendar.keys():
+                if break_index == print_number:
+                    break
+                print(date_keys, self.dict_calendar[date_keys])
+                break_index += 1
 
     def print_date(self):
         for date_keys in self.dict_calendar.keys():
             print(date_keys)
 
-    def create(self):
+    def create(self, calendar: {}):
         """
         Calendar Creation.
         :return: Nothing
         """
-        self.date_format = self.date_format
-        self.date_delimeter = self.date_delimeter
         list_timestamp, int_list_size = self.set_time(hour_start=self.hour_start,
                                                       hour_end=self.hour_end,
                                                       hour_step=self.hour_step,
@@ -535,8 +545,6 @@ class MyCalendar:
         self.int_list_size = int_list_size
 
         for year_index in range(len(self.list_of_years)):
-            # print(self.list_of_years[year_index], self.list_of_year_is_leap[year_index])
-
             if self.list_of_year_is_leap[year_index]:
                 for month in range(0, 12):
                     for day in range(0, list_int_month_days_leap[month]):
@@ -545,10 +553,10 @@ class MyCalendar:
                                                         year=str(self.list_of_years[year_index]),
                                                         date_format=self.date_format,
                                                         date_delimeter=self.date_delimeter)
-                        self.dict_calendar[date_tmp] = {}
+                        calendar[date_tmp] = EMPTY_DICT.copy()
                         if self.is_time:
                             for timestamp in self.list_timespamp:
-                                self.dict_calendar[date_tmp][timestamp] = {}
+                                calendar[date_tmp][timestamp] = EMPTY_DICT.copy()
             else:
                 for month in range(0, 12):
                     for day in range(0, list_int_month_days_not_leap[month]):
@@ -557,21 +565,108 @@ class MyCalendar:
                                                         year=str(self.list_of_years[year_index]),
                                                         date_format=self.date_format,
                                                         date_delimeter=self.date_delimeter)
-                        self.dict_calendar[date_tmp] = {}
+                        calendar[date_tmp] = EMPTY_DICT.copy()
                         if self.is_time:
                             for timestamp in self.list_timespamp:
-                                self.dict_calendar[date_tmp][timestamp] = {}
+                                calendar[date_tmp][timestamp] = EMPTY_DICT.copy()
 
-    def add_list_key_event_to_calendar(self, list_key_event: [], event_type={}):
-        for date_key in self.dict_calendar.keys():
+    def add_list_key_event_to_calendar(self, list_key_event: [], list_of_headers=None):
+        for date in self.dict_calendar.keys():
             if self.is_time:
-                for time_key in self.dict_calendar[date_key]:
-                    for event in list_key_event:
-                        self.dict_calendar[date_key][time_key][event] = event_type
+                pass
             else:
-                for event in list_key_event:
-                    self.dict_calendar[date_key][event] = event_type
+                if list_of_headers is None:
+                    for event in list_key_event:
+                        self.dict_calendar[date][event] = NaN
+                else:
+                    for event in list_key_event:
+                        self.dict_calendar[date][event] = {}
+                        for header in list_of_headers:
+                            self.dict_calendar[date][event][header] = NaN
 
-    #
-    def add_events_to_calendar(self, list_of_events: [], first_row_header: bool, ):
-        pass
+    def add_events_to_calendar(self, list_of_events: [], date_index, time_index, first_row_header: bool,
+                               list_of_headers=None,
+                               event_index=None):
+        self.event_names = []
+        self.header_names = []
+        start_index = 0
+        header_size = 0
+        if first_row_header:
+            start_index = 1
+            header_size = len(list_of_events[0])
+
+        for i in range(start_index, len(list_of_events)):
+            date = list_of_events[i][date_index]
+
+            if self.is_time:
+                print("is time")
+            else:
+                # print(i, date, list_of_events[i][event_index], list_of_events[i])
+                if first_row_header:
+                    event_name = list_of_events[i][event_index]
+                    if event_name not in self.event_names:
+                        self.event_names.append(event_name)
+                    for j in range(0, header_size):
+                        header_name = list_of_events[0][j]
+                        if header_name not in self.header_names:
+                            self.header_names.append(header_name)
+                        if event_name not in self.dict_calendar[date].keys():
+                            self.dict_calendar[date][event_name] = {}
+                        self.dict_calendar[date][event_name][header_name] = list_of_events[i][j]
+
+    def fill_calendar_with_missing_keys(self):
+        for date in self.dict_calendar.keys():
+            if self.is_time:
+                pass
+            else:
+                for event in self.event_names:
+                    if event not in self.dict_calendar[date].keys():
+                        self.dict_calendar[date][event] = {}
+                        for header in self.header_names:
+                            self.dict_calendar[date][event][header] = NaN
+                    else:
+                        for header in self.header_names:
+                            if header not in self.dict_calendar[date][event].keys():
+                                self.dict_calendar[date][event][header] = NaN
+
+    def dict_to_list(self, date_range=None):
+        header_list_tmp = []
+        output_list = []
+        append_header = True
+        is_data_in_range = False
+
+        for date in self.dict_calendar.keys():
+            if self.is_time:
+                pass
+            else:
+                if type(self.dict_calendar[date]) is dict:
+                    for event in self.dict_calendar[date].keys():
+                        if type(self.dict_calendar[date][event]) is dict:
+                            tmp_list = []
+                            for header in self.dict_calendar[date][event].keys():
+                                if header not in header_list_tmp:
+                                    header_list_tmp.append(header)
+                                tmp_list.append(self.dict_calendar[date][event][header])
+                            if append_header:
+                                output_list.append(header_list_tmp)
+                                append_header = False
+                            output_list.append(tmp_list)
+                        else:
+                            tmp_list = []
+                            for event_name in self.dict_calendar[date]:
+                                if event_name not in header_list_tmp:
+                                    header_list_tmp.append(event_name)
+                                if date_range is None:
+                                    tmp_list.append(self.dict_calendar[date][event_name])
+                                else:
+                                    if date_range[0] == date or is_data_in_range:
+                                        is_data_in_range = True
+                                        tmp_list.append(self.dict_calendar[date][event_name])
+                                        if date_range[1] == date:
+                                            is_data_in_range = False
+
+                            if append_header:
+                                output_list.append(header_list_tmp)
+                                append_header = False
+                            output_list.append(tmp_list)
+        return output_list
