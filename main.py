@@ -5,7 +5,11 @@ def test_temperature_dataset():
     # Common To Both Years
     # Create the output CSV informations
     final_csv_header = ['Date', 'Time', 'Athens_Temp', 'Brest_Temp', 'Madrid_Temp', 'Vienna_Temp']
-    dataset_event_names = ['Athens_Temp', 'Brest_Temp', 'Madrid_Temp', 'Vienna_Temp']
+    Athens_csv_header = ['Date', 'Time', 'Athens_Temp']
+    Brest_csv_header = ['Date', 'Time', 'Brest_Temp']
+    Madrid_csv_header = ['Date', 'Time', 'Madrid_Temp']
+    Vienna_csv_header = ['Date', 'Time', 'Vienna_Temp']
+    dataset_event_names = ['Temperature']
     dataset_month_range = [6, 10]
     dataset_day_range = [30, 30]
     no_data_value = None
@@ -22,41 +26,40 @@ def test_temperature_dataset():
     list_Vienna_2020 = cal_v2.read_csv(path_Vienna_2020)
 
     # Calendar Creation for the year of 2020 and add default event values
-    temp_cal_2020 = cal_v2.MyCalendar(list_of_years=[2020], is_time=True, date_format=cal_v2.DD_MM_YYYY,
+    temp_cal_2020 = cal_v2.MyCalendar(list_of_years=[2020], is_time=True, date_format=cal_v2.MM_DD_YYYY,
                                       date_delimeter=cal_v2.del_slash, time_format=cal_v2.HH_MM,
                                       time_delimeter=cal_v2.del_colon, hour_start=0, hour_end=24, hour_step=1,
                                       minute_start=0, minute_end=60, minute_step=0)
-    temp_cal_2020.create()
-    temp_cal_2020.print()
-    '''
-    temp_cal_2020.add_default_events_in_range_date_hour(event_list=dataset_names, no_data_value=no_data_value,
-                                                        month_start=dataset_month_range[0],
-                                                        month_end=dataset_month_range[1],
-                                                        day_start=dataset_day_range[0], day_end=dataset_day_range[1])
+
     # Change the Brest_2020 date format to be the same as calenda's.
     list_Brest_2020 = temp_cal_2020.change_date_format_in_list(list_event=list_Brest_2020,
-                                                               date_format_from=cal.MM_DD_YY,
-                                                               date_format_to=cal.MM_DD_YYYY,
-                                                               date_delimeter_from=cal.del_slash,
-                                                               date_delimeter_to=cal.del_slash,
+                                                               date_index=0,
+                                                               date_format_from=cal_v2.MM_DD_YY,
+                                                               date_format_to=cal_v2.MM_DD_YYYY,
+                                                               date_delimeter_from=cal_v2.del_slash,
+                                                               date_delimeter_to=cal_v2.del_slash,
                                                                century=21)
-    # Add events to calendar
-    temp_cal_2020.add_values_for_event_from_list_date_hour(event_name=dataset_names[0], event_list=list_Athens_2020)
-    temp_cal_2020.add_values_for_event_from_list_date_hour(event_name=dataset_names[1], event_list=list_Brest_2020)
-    temp_cal_2020.add_values_for_event_from_list_date_hour(event_name=dataset_names[2], event_list=list_Madrid_2020)
-    temp_cal_2020.add_values_for_event_from_list_date_hour(event_name=dataset_names[3], event_list=list_Vienna_2020)
-    '''
+
+    temp_cal_2020.add_list_key_event_to_calendar(list_key_event=dataset_event_names, list_of_headers=final_csv_header)
+    temp_cal_2020.add_events_to_calendar(list_of_events=list_Athens_2020, date_index=0, time_index=1,
+                                         first_row_header=False, list_of_headers=Athens_csv_header, event_index=0,
+                                         input_event_name=dataset_event_names[0])  # 1
+    temp_cal_2020.add_events_to_calendar(list_of_events=list_Brest_2020, date_index=0, time_index=1,
+                                         first_row_header=False, list_of_headers=Brest_csv_header, event_index=0,
+                                         input_event_name=dataset_event_names[0])  # 2
+    temp_cal_2020.add_events_to_calendar(list_of_events=list_Madrid_2020, date_index=0, time_index=1,
+                                         first_row_header=False, list_of_headers=Madrid_csv_header, event_index=0,
+                                         input_event_name=dataset_event_names[0])  # 3
+    temp_cal_2020.add_events_to_calendar(list_of_events=list_Vienna_2020, date_index=0, time_index=1,
+                                         first_row_header=False, list_of_headers=Vienna_csv_header, event_index=0,
+                                         input_event_name=dataset_event_names[0])  # 4
+    # temp_cal_2020.print()
+    list_temperatures = temp_cal_2020.dict_to_list(['07/31/2020', '11/30/2020'])
+    cal_v2.write_csv(csv_path="export_folder/temperatures_2020.csv",
+                     list_write=list_temperatures, delimeter=cal_v2.del_comma)
 
 
 def test_covid_dataset():
-    # Common To Both Years
-    # Create the output CSV informations
-    final_csv_header = []
-    dataset_event_names = ['Athens_Temp', 'Brest_Temp', 'Madrid_Temp', 'Vienna_Temp']
-    dataset_month_range = [6, 10]
-    dataset_day_range = [30, 30]
-    no_data_value = None
-
     str_changes_visitors_path = 'data/covid_dataset/changes-visitors-covid.csv'
     str_covid_19_testing_policy_path = 'data/covid_dataset/covid-19-testing-policy.csv'
     str_covid_contact_tracing_path = 'data/covid_dataset/covid-contact-tracing.csv'
@@ -207,5 +210,5 @@ def test_covid_dataset():
     # covid_caledar.print(1)
 
 
-# test_temperature_dataset()
-test_covid_dataset()
+test_temperature_dataset()
+# test_covid_dataset()
