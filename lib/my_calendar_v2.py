@@ -87,7 +87,7 @@ DOUBLE = 'double'
 HH_MM = 'hhmm'
 HH_MM_SS = 'hhmmss'
 
-# Delimeters
+# Delimiters
 del_none = ''
 del_comma = ','
 del_hashtag = '#'
@@ -115,39 +115,39 @@ merge_median = 'median'
 # -------------------------------- #
 
 
-def read_csv(csv_path: str, delimeter=del_comma):
+def read_csv(csv_path: str, delimiter=del_comma):
     """
     A Function for reading CSV files.
     :param csv_path: The path for the csv to be imported.
-    :param delimeter: The delimeter of values.
+    :param delimiter: The delimiter of values.
     :return: []
     """
     import csv  # import csv library
     list_tmp_csv = []  # create a temporary empty list
     with open(csv_path) as csv_file:  # open the csv path
-        csv_reader = csv.reader(csv_file, delimiter=delimeter)
+        csv_reader = csv.reader(csv_file, delimiter=delimiter)
         for row in csv_reader:  # for each row in csv_reader file
             list_tmp_csv.append(row)  # append the row to list
     return list_tmp_csv  # return the list
 
 
-def write_csv(csv_path: str, list_write: [], delimeter=del_comma):
+def write_csv(csv_path: str, list_write: [], delimiter=del_comma):
     """
     A Function for writing CSV files.
     :param csv_path: The path for the csv to be exported.
     :param list_write: The list to be written in file
-    :param delimeter: The delimeter for values
+    :param delimiter: The delimiter for values
     :return: Nothing
     """
     import csv  # import csv library
     import os  # import os library
     if not os.path.exists(os.path.dirname(csv_path)):  # Check if path does not exist
         warnings.warn("Path does not exist! Path will be created!")  # Warn in console
-        directory = os.path.dirname(csv_path)  # Find the direcrories in the path
+        directory = os.path.dirname(csv_path)  # Find the directories in the path
         os.mkdir(directory)  # Create the directories
 
     with open(csv_path, 'w', newline='') as csvfile:  # Open the path to write the file
-        csv_writer = csv.writer(csvfile, delimiter=delimeter, quotechar='|', quoting=csv.QUOTE_MINIMAL)
+        csv_writer = csv.writer(csvfile, delimiter=delimiter, quotechar='|', quoting=csv.QUOTE_MINIMAL)
         for row in list_write:  # For each row
             csv_writer.writerow(row)  # Write row to file
 
@@ -157,7 +157,7 @@ def write_csv(csv_path: str, list_write: [], delimeter=del_comma):
 # ------------------------------------------- #
 
 def set_time(hour_start=0, hour_end=24, hour_step=1, minute_start=0, minute_end=60, minute_step=0,
-             delimeter=del_colon):
+             delimiter=del_colon):
     """
     :param hour_start: The starting hour. Range (0, 24)
     :param hour_end: The ending hour. Range (0, 24)
@@ -165,7 +165,7 @@ def set_time(hour_start=0, hour_end=24, hour_step=1, minute_start=0, minute_end=
     :param minute_start: The starting minute. Range (0, 60).
     :param minute_end: The ending minute. Range (0, 60)
     :param minute_step: The minute step. Range (0, 60). Big step means the same minute every hour.
-    :param delimeter: Delimeter for time
+    :param delimiter: Delimiter for time
     :return: list_timestamp, int_size
     """
     if hour_start < 0 or hour_start > 24:  # if hour_start outside original hour ranges
@@ -190,7 +190,7 @@ def set_time(hour_start=0, hour_end=24, hour_step=1, minute_start=0, minute_end=
         for hour in range(hour_start, hour_end, hour_step):
             if minute_step == 0:  # if minute_step is 0
                 # Create a timestamp_tmp
-                timestamp_tmp = list_str_id_hours[hour] + delimeter
+                timestamp_tmp = list_str_id_hours[hour] + delimiter
                 timestamp_tmp += list_str_id_minutes[0]
                 list_timestamp.append(timestamp_tmp)  # append to list_timestamp
                 int_size += 1
@@ -198,7 +198,7 @@ def set_time(hour_start=0, hour_end=24, hour_step=1, minute_start=0, minute_end=
             else:
                 for minutes in range(minute_start, minute_end, minute_step):
                     # Create a timestamp_tmp
-                    timestamp_tmp = list_str_id_hours[hour] + delimeter
+                    timestamp_tmp = list_str_id_hours[hour] + delimiter
                     timestamp_tmp += list_str_id_minutes[minutes]
                     list_timestamp.append(timestamp_tmp)  # append to list_timestamp
                     int_size += 1
@@ -226,7 +226,7 @@ def change_day_month_format(day, month, date_format=DOUBLE):
     return day_format, month_format
 
 
-def date_break_to_day_month_year(date: str, date_format: str, date_delimeter=del_slash, century=21):
+def date_break_to_day_month_year(date: str, date_format: str, date_delimiter=del_slash, century=21):
     """
             Check the format of the day (eg DD/MM/YYYY) and returns a string.
             :param century: The current century
@@ -256,42 +256,42 @@ def date_break_to_day_month_year(date: str, date_format: str, date_delimeter=del
                                                          YY_M_D
                                                          YY_D_M
 
-            :param date_delimeter: The delimeter of the date.
+            :param date_delimiter: The delimiter of the date.
             :return: day: str, month: str, year: str
             """
     # DD_MM_YYYY or D_M_YYYY or DD_MM_YY or D_M_YY
     if date_format == DD_MM_YYYY or date_format == D_M_YYYY or date_format == DD_MM_YY or date_format == D_M_YY:
-        day, month, year = date.split(date_delimeter)  # split the date using the delimeter
+        day, month, year = date.split(date_delimiter)  # split the date using the delimiter
         if date_format == DD_MM_YY or date_format == D_M_YY:
             year = str(int(year) + (century - 1) * 100)
         return day, month, year
     # DD_YYYY_MM or D_YYYY_M or DD_YY_MM or D_YY_M
     elif date_format == DD_YYYY_MM or date_format == D_YYYY_M or date_format == DD_YY_MM or date_format == D_YY_M:
-        day, year, month = date.split(date_delimeter)  # split the date using the delimeter
+        day, year, month = date.split(date_delimiter)  # split the date using the delimiter
         if date_format == DD_YY_MM or date_format == D_YY_M:
             year = str(int(year) + (century - 1) * 100)
         return day, month, year
     # MM_DD_YYYY or M_D_YYYY or MM_DD_YY or M_D_YY
     elif date_format == MM_DD_YYYY or date_format == M_D_YYYY or date_format == MM_DD_YY or date_format == M_D_YY:
-        month, day, year = date.split(date_delimeter)  # split the date using the delimeter
+        month, day, year = date.split(date_delimiter)  # split the date using the delimiter
         if date_format == MM_DD_YY or date_format == M_D_YY:
             year = str(int(year) + (century - 1) * 100)
         return day, month, year
     # MM_YYYY_DD or M_YYYY_D or MM_YY_DD or M_YY_D
     elif date_format == MM_YYYY_DD or date_format == M_YYYY_D or date_format == MM_YY_DD or date_format == M_YY_D:
-        month, year, day = date.split(date_delimeter)  # split the date using the delimeter
+        month, year, day = date.split(date_delimiter)  # split the date using the delimiter
         if date_format == MM_YY_DD or date_format == M_YY_D:
             year = str(int(year) + (century - 1) * 100)
         return day, month, year
     # YYYY_MM_DD or YYYY_M_D or YY_MM_DD or YY_M_D
     elif date_format == YYYY_MM_DD or date_format == YYYY_M_D or date_format == YY_MM_DD or date_format == YY_M_D:
-        year, month, day = date.split(date_delimeter)  # split the date using the delimeter
+        year, month, day = date.split(date_delimiter)  # split the date using the delimiter
         if date_format == YY_MM_DD or date_format == YY_M_D:
             year = str(int(year) + (century - 1) * 100)
         return day, month, year
     # YYYY_DD_MM or YYYY_D_M or YY_DD_MM or YY_D_M
     elif date_format == YYYY_DD_MM or date_format == YYYY_D_M or date_format == YY_DD_MM or date_format == YY_D_M:
-        year, day, month = date.split(date_delimeter)  # split the date using the delimeter
+        year, day, month = date.split(date_delimiter)  # split the date using the delimiter
         if date_format == YY_DD_MM or date_format == YY_D_M:
             year = str(int(year) + (century - 1) * 100)
         return day, month, year
@@ -308,7 +308,7 @@ def change_hour_number_list_to_time(list_hour: [], time_format=HH_MM):
     return list_hour_tmp
 
 
-def set_date_format(day: str, month: str, year: str, date_format=DD_MM_YYYY, date_delimeter=del_slash):
+def set_date_format(day: str, month: str, year: str, date_format=DD_MM_YYYY, date_delimiter=del_slash):
     """
     Check the format of the day (eg DD/MM/YYYY) and returns a string.
     :param day: The day of the date.
@@ -339,119 +339,119 @@ def set_date_format(day: str, month: str, year: str, date_format=DD_MM_YYYY, dat
                                                  YY_M_D
                                                  YY_D_M
 
-    :param date_delimeter: The delimeter of the date.
+    :param date_delimiter: The delimiter of the date.
     :return: A date string.
     """
     # DD_MM_YYYY
     if date_format == DD_MM_YYYY:
         day, month = change_day_month_format(day=day, month=month, date_format=DOUBLE)
-        return day + date_delimeter + month + date_delimeter + year
+        return day + date_delimiter + month + date_delimiter + year
     # DD_YYYY_MM
     elif date_format == DD_YYYY_MM:
         day, month = change_day_month_format(day=day, month=month, date_format=DOUBLE)
-        return day + date_delimeter + year + date_delimeter + month
+        return day + date_delimiter + year + date_delimiter + month
     # MM_DD_YYYY
     elif date_format == MM_DD_YYYY:
         day, month = change_day_month_format(day=day, month=month, date_format=DOUBLE)
-        return month + date_delimeter + day + date_delimeter + year
+        return month + date_delimiter + day + date_delimiter + year
     # MM_YYYY_DD
     elif date_format == MM_YYYY_DD:
         day, month = change_day_month_format(day=day, month=month, date_format=DOUBLE)
-        return month + date_delimeter + year + date_delimeter + day
+        return month + date_delimiter + year + date_delimiter + day
     # YYYY_MM_DD
     elif date_format == YYYY_MM_DD:
         day, month = change_day_month_format(day=day, month=month, date_format=DOUBLE)
-        return year + date_delimeter + month + date_delimeter + day
+        return year + date_delimiter + month + date_delimiter + day
     # YYYY_DD_MM
     elif date_format == YYYY_DD_MM:
         day, month = change_day_month_format(day=day, month=month, date_format=DOUBLE)
-        return year + date_delimeter + day + date_delimeter + month
+        return year + date_delimiter + day + date_delimiter + month
 
     # D_M_YYYY
     elif date_format == D_M_YYYY:
         day, month = change_day_month_format(day=day, month=month, date_format=SINGLE)
-        return day + date_delimeter + month + date_delimeter + year
+        return day + date_delimiter + month + date_delimiter + year
     # D_YYYY_M
     elif date_format == D_YYYY_M:
         day, month = change_day_month_format(day=day, month=month, date_format=SINGLE)
-        return day + date_delimeter + year + date_delimeter + month
+        return day + date_delimiter + year + date_delimiter + month
     # M_D_YYYY
     elif date_format == M_D_YYYY:
         day, month = change_day_month_format(day=day, month=month, date_format=SINGLE)
-        return month + date_delimeter + day + date_delimeter + year
+        return month + date_delimiter + day + date_delimiter + year
     # M_YYYY_D
     elif date_format == M_YYYY_D:
         day, month = change_day_month_format(day=day, month=month, date_format=SINGLE)
-        return month + date_delimeter + year + date_delimeter + day
+        return month + date_delimiter + year + date_delimiter + day
     # YYYY_M_D
     elif date_format == YYYY_M_D:
         day, month = change_day_month_format(day=day, month=month, date_format=SINGLE)
-        return year + date_delimeter + month + date_delimeter + day
+        return year + date_delimiter + month + date_delimiter + day
     # YYYY_D_M
     elif date_format == YYYY_D_M:
         day, month = change_day_month_format(day=day, month=month, date_format=SINGLE)
-        return year + date_delimeter + day + date_delimeter + month
+        return year + date_delimiter + day + date_delimiter + month
 
     # DD_MM_YY
     if date_format == DD_MM_YY:
         day, month = change_day_month_format(day=day, month=month, date_format=DOUBLE)
-        return day + date_delimeter + month + date_delimeter + str(int(year) % 100)
+        return day + date_delimiter + month + date_delimiter + str(int(year) % 100)
     # DD_YY_MM
     elif date_format == DD_YY_MM:
         day, month = change_day_month_format(day=day, month=month, date_format=DOUBLE)
-        return day + date_delimeter + str(int(year) % 100) + date_delimeter + month
+        return day + date_delimiter + str(int(year) % 100) + date_delimiter + month
     # MM_DD_YY
     elif date_format == MM_DD_YY:
         day, month = change_day_month_format(day=day, month=month, date_format=DOUBLE)
-        return month + date_delimeter + day + date_delimeter + str(int(year) % 100)
+        return month + date_delimiter + day + date_delimiter + str(int(year) % 100)
     # MM_YY_DD
     elif date_format == MM_YY_DD:
         day, month = change_day_month_format(day=day, month=month, date_format=DOUBLE)
-        return month + date_delimeter + str(int(year) % 100) + date_delimeter + day
+        return month + date_delimiter + str(int(year) % 100) + date_delimiter + day
     # YY_MM_DD
     elif date_format == YY_MM_DD:
         day, month = change_day_month_format(day=day, month=month, date_format=DOUBLE)
-        return str(int(year) % 100) + date_delimeter + month + date_delimeter + day
+        return str(int(year) % 100) + date_delimiter + month + date_delimiter + day
     # YY_DD_MM
     elif date_format == YY_DD_MM:
         day, month = change_day_month_format(day=day, month=month, date_format=DOUBLE)
-        return str(int(year) % 100) + date_delimeter + day + date_delimeter + month
+        return str(int(year) % 100) + date_delimiter + day + date_delimiter + month
 
     # D_M_YY
     elif date_format == D_M_YY:
         day, month = change_day_month_format(day=day, month=month, date_format=SINGLE)
-        return day + date_delimeter + month + date_delimeter + str(int(year) % 100)
+        return day + date_delimiter + month + date_delimiter + str(int(year) % 100)
     # D_YY_M
     elif date_format == D_YY_M:
         day, month = change_day_month_format(day=day, month=month, date_format=SINGLE)
-        return day + date_delimeter + str(int(year) % 100) + date_delimeter + month
+        return day + date_delimiter + str(int(year) % 100) + date_delimiter + month
     # M_D_YY
     elif date_format == M_D_YY:
         day, month = change_day_month_format(day=day, month=month, date_format=SINGLE)
-        return month + date_delimeter + day + date_delimeter + str(int(year) % 100)
+        return month + date_delimiter + day + date_delimiter + str(int(year) % 100)
     # M_YY_D
     elif date_format == M_YY_D:
         day, month = change_day_month_format(day=day, month=month, date_format=SINGLE)
-        return month + date_delimeter + str(int(year) % 100) + date_delimeter + day
+        return month + date_delimiter + str(int(year) % 100) + date_delimiter + day
     # YY_M_D
     elif date_format == YY_M_D:
         day, month = change_day_month_format(day=day, month=month, date_format=SINGLE)
-        return str(int(year) % 100) + date_delimeter + month + date_delimeter + day
+        return str(int(year) % 100) + date_delimiter + month + date_delimiter + day
     # YY_D_M
     elif date_format == YY_D_M:
         day, month = change_day_month_format(day=day, month=month, date_format=SINGLE)
-        return str(int(year) % 100) + date_delimeter + day + date_delimeter + month
+        return str(int(year) % 100) + date_delimiter + day + date_delimiter + month
 
 
 def change_date_format_in_list(list_event: [], date_index, date_format_from: str, date_format_to: str,
-                               date_delimeter_from=del_slash, date_delimeter_to=del_slash, century=21):
+                               date_delimiter_from=del_slash, date_delimiter_to=del_slash, century=21):
     list_date_new = []  # list for new dates
     for event in list_event:  # parsing all events in list
         day, month, year = date_break_to_day_month_year(date=event[date_index], date_format=date_format_from,
-                                                        date_delimeter=date_delimeter_from, century=century)
+                                                        date_delimiter=date_delimiter_from, century=century)
 
         date_tmp = set_date_format(day=day, month=month, year=year,
-                                   date_format=date_format_to, date_delimeter=date_delimeter_to)
+                                   date_format=date_format_to, date_delimiter=date_delimiter_to)
         event[date_index] = date_tmp
         list_date_new.append(event)
 
@@ -459,11 +459,11 @@ def change_date_format_in_list(list_event: [], date_index, date_format_from: str
 
 
 def change_date_format_from_string(str_date: str, date_format_from: str, date_format_to: str,
-                                   date_delimeter_from=del_slash, date_delimeter_to=del_slash, century=21):
+                                   date_delimiter_from=del_slash, date_delimiter_to=del_slash, century=21):
     day, month, year = date_break_to_day_month_year(date=str_date, date_format=date_format_from,
-                                                    date_delimeter=date_delimeter_from, century=century)
+                                                    date_delimiter=date_delimiter_from, century=century)
     new_date = set_date_format(day=day, month=month, year=year,
-                               date_format=date_format_to, date_delimeter=date_delimeter_to)
+                               date_format=date_format_to, date_delimiter=date_delimiter_to)
     return new_date
 
 # ------------------------------------- #
@@ -485,9 +485,9 @@ def isLeap(year=dt.datetime.now().year):
         return False  # is not leap
 
 
-def break_date_range_to_periods(date_start, date_end, period_step, date_format, date_delimeter=del_slash, century=21):
+def break_date_range_to_periods(date_start, date_end, period_step, date_format, date_delimiter=del_slash, century=21):
     day_start, month_start, year_start = date_break_to_day_month_year(date=date_start, date_format=date_format,
-                                                                      date_delimeter=date_delimeter, century=century)
+                                                                      date_delimiter=date_delimiter, century=century)
 
     date_range_list = []
     curr_day = int(day_start)
@@ -510,9 +510,9 @@ def break_date_range_to_periods(date_start, date_end, period_step, date_format, 
                 next_year += 1
 
         curr_date = set_date_format(day=str(curr_day), month=str(curr_month), year=str(curr_year),
-                                    date_format=date_format, date_delimeter=date_delimeter)
+                                    date_format=date_format, date_delimiter=date_delimiter)
         next_date = set_date_format(day=str(next_day), month=str(next_month), year=str(next_year),
-                                    date_format=date_format, date_delimeter=date_delimeter)
+                                    date_format=date_format, date_delimiter=date_delimiter)
 
         if next_date > date_end:
             break
@@ -567,7 +567,7 @@ def merge_values_in_date_range_list(list_input: [], date_index: int, date_range_
             str_date_range = start_date.replace(del_input, del_output) + "_" + end_date.replace(del_input, del_output)
 
         if merge_type == merge_min:  # if merge type is min
-            tmp_data_min = []  # temporaty data list to store the min values
+            tmp_data_min = []  # temporary data list to store the min values
             for row in list_input:  # for row in list_input
                 if start_date <= row[date_index] <= end_date:  # if date in date range
                     if start_date == row[date_index]:  # if start date equals to row_date
@@ -580,7 +580,7 @@ def merge_values_in_date_range_list(list_input: [], date_index: int, date_range_
             merged_list.append([str_date_range, tmp_data_min])
 
         elif merge_type == merge_max:  # if merge type is max
-            tmp_data_max = []  # temporaty data list to store the max values
+            tmp_data_max = []  # temporary data list to store the max values
             for row in list_input:  # for row in list_input
                 if start_date <= row[date_index] <= end_date:  # if date in date range
                     if start_date == row[date_index]:  # if start date equals to row_date
@@ -593,7 +593,7 @@ def merge_values_in_date_range_list(list_input: [], date_index: int, date_range_
             merged_list.append([str_date_range, tmp_data_max])
 
         elif merge_type == merge_mean:  # if merge type is mean
-            tmp_data_mean = tmp_zero_list.copy()  # temporaty data list to calculate the mean values
+            tmp_data_mean = tmp_zero_list.copy()  # temporary data list to calculate the mean values
             mean_counter = 0
             for row in list_input:  # for row in list_input
                 if start_date <= row[date_index] <= end_date:  # if date in date range
@@ -606,7 +606,7 @@ def merge_values_in_date_range_list(list_input: [], date_index: int, date_range_
             merged_list.append([str_date_range, tmp_out_mean])
 
         elif merge_type == merge_median:  # if merge type is median
-            tmp_data_median = tmp_list_of_empty_lists.copy()  # temporaty data list to calculate the median values
+            tmp_data_median = tmp_list_of_empty_lists.copy()  # temporary data list to calculate the median values
             for row in list_input:  # for row in list_input
                 if start_date <= row[date_index] <= end_date:  # if date in date range
                     tmp_raw_data = raw_data(in_row=row)  # create a temporary list to store row date
@@ -621,25 +621,25 @@ def merge_values_in_date_range_list(list_input: [], date_index: int, date_range_
 
 class MyCalendar:
     def __init__(self, list_of_years: [] = None, is_time: bool = False, date_format=DD_MM_YYYY,
-                 date_delimeter=del_slash, time_format=HH_MM, time_delimeter=del_colon,
+                 date_delimiter=del_slash, time_format=HH_MM, time_delimiter=del_colon,
                  hour_start=0, hour_end=24, hour_step=1, minute_start=0, minute_end=60, minute_step=0):
         if list_of_years is None or list_of_years == EMPTY_LIST:  # if list_of_year is None
             list_of_years = [dt.datetime.now().year]  # create a list with only the current year
         self.list_of_years = list_of_years  # set the self.list_of_years
         self.list_of_year_is_leap = [isLeap(year) for year in list_of_years]  # set list_of_is_leap
         self.date_format = date_format  # set the date format
-        self.date_delimeter = date_delimeter  # set the date delimeter
+        self.date_delimiter = date_delimiter  # set the date delimiter
 
         self.is_time = is_time  # set the self.is_time
         self.time_format = time_format  # set the time format
-        self.time_delimeter = time_delimeter  # set the time delimeter
+        self.time_delimiter = time_delimiter  # set the time delimiter
         self.hour_start = hour_start  # set hour start
         self.hour_end = hour_end  # set hour end
         self.hour_step = hour_step  # set hour step
         self.minute_start = minute_start  # set minute start
         self.minute_end = minute_end  # set minute end
         self.minute_step = minute_step  # set minute step
-        self.list_timespamp = None  # set the list timestamp
+        self.list_timestamp = None  # set the list timestamp
         self.int_list_size = 0  # set the list size to 0
 
         self.dict_calendar = EMPTY_DICT.copy()  # create the calendar
@@ -649,7 +649,7 @@ class MyCalendar:
 
     def change_hour_number_in_a_cal_list_to_time(self, list_event: [], time_index):
         """
-        In a given list change the time forma to calendar time format
+        In a given list change the time format to calendar time format
         :param list_event: the list of events
         :param time_index: the index of time column in list
         :return: list_hour
@@ -666,14 +666,14 @@ class MyCalendar:
         return list_hour_tmp
 
     def change_date_format_in_a_cal_list(self, list_event: [], date_index, date_format_from: str,
-                                         date_delimeter_from=del_slash, century=21):
+                                         date_delimiter_from=del_slash, century=21):
         list_date_new = []  # list for new dates
         for event in list_event:  # parsing all events in list
             day, month, year = date_break_to_day_month_year(date=event[date_index], date_format=date_format_from,
-                                                            date_delimeter=date_delimeter_from, century=century)
+                                                            date_delimiter=date_delimiter_from, century=century)
 
             date_tmp = set_date_format(day=day, month=month, year=year,
-                                       date_format=self.date_format, date_delimeter=self.date_delimeter)
+                                       date_format=self.date_format, date_delimiter=self.date_delimiter)
             event[date_index] = date_tmp
             list_date_new.append(event)
 
@@ -707,7 +707,7 @@ class MyCalendar:
                                                  minute_end=self.minute_end,
                                                  minute_step=self.minute_step)
 
-        self.list_timespamp = list_timestamp
+        self.list_timestamp = list_timestamp
         self.int_list_size = int_list_size
 
         for year_index in range(len(self.list_of_years)):
@@ -718,10 +718,10 @@ class MyCalendar:
                                                    month=list_str_id_months_mm[month],
                                                    year=str(self.list_of_years[year_index]),
                                                    date_format=self.date_format,
-                                                   date_delimeter=self.date_delimeter)
+                                                   date_delimiter=self.date_delimiter)
                         self.dict_calendar[date_tmp] = EMPTY_DICT.copy()
                         if self.is_time:
-                            for timestamp in self.list_timespamp:
+                            for timestamp in self.list_timestamp:
                                 self.dict_calendar[date_tmp][timestamp] = EMPTY_DICT.copy()
             else:
                 for month in range(0, 12):
@@ -730,10 +730,10 @@ class MyCalendar:
                                                    month=list_str_id_months_mm[month],
                                                    year=str(self.list_of_years[year_index]),
                                                    date_format=self.date_format,
-                                                   date_delimeter=self.date_delimeter)
+                                                   date_delimiter=self.date_delimiter)
                         self.dict_calendar[date_tmp] = EMPTY_DICT.copy()
                         if self.is_time:
-                            for timestamp in self.list_timespamp:
+                            for timestamp in self.list_timestamp:
                                 self.dict_calendar[date_tmp][timestamp] = EMPTY_DICT.copy()
 
     def add_list_key_event_to_calendar(self, list_key_event: [], list_of_headers=None):
