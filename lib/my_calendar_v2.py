@@ -23,13 +23,17 @@ import warnings
 
 # Create lists that corresponds to date, time strings
 # Create list for months
+# One digit months
 list_str_id_months_m = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12']
+# Two digit months
 list_str_id_months_mm = ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12']
 
 # Create list for days
+# One digit days
 list_str_id_days_d = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12',
                       '13', '14', '15', '16', '17', '18', '19', '20', '21', '22', '23', '24',
                       '25', '26', '27', '28', '29', '30', '31']
+# Two digit days
 list_str_id_days_dd = ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12',
                        '13', '14', '15', '16', '17', '18', '19', '20', '21', '22', '23', '24',
                        '25', '26', '27', '28', '29', '30', '31']
@@ -38,7 +42,7 @@ list_str_id_days_dd = ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10
 list_str_id_hours = ['00', '01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11',
                      '12', '13', '14', '15', '16', '17', '18', '19', '20', '21', '22', '23']
 
-# Create list for hours
+# Create list for minutes
 list_str_id_minutes = ['00', '01', '02', '03', '04', '05', '06', '07', '08', '09',
                        '10', '11', '12', '13', '14', '15', '16', '17', '18', '19',
                        '20', '21', '22', '23', '24', '25', '26', '27', '28', '29',
@@ -47,60 +51,60 @@ list_str_id_minutes = ['00', '01', '02', '03', '04', '05', '06', '07', '08', '09
                        '50', '51', '52', '53', '54', '55', '56', '57', '58', '59']
 
 # Leap situations
-list_int_month_days_not_leap = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
-list_int_month_days_leap = [31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
+list_int_month_days_not_leap = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]  # non-leap list
+list_int_month_days_leap = [31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]  # leap list
 
 # Different systems to create a date
-DD_MM_YYYY = 'ddmmyyyy'
-DD_YYYY_MM = 'ddyyyymm'
-MM_DD_YYYY = 'mmddyyyy'
-MM_YYYY_DD = 'mmyyyydd'
-YYYY_MM_DD = 'yyyymmdd'
-YYYY_DD_MM = 'yyyyddmm'
+DD_MM_YYYY = 'ddmmyyyy'  # e.g. 31/12/2021
+DD_YYYY_MM = 'ddyyyymm'  # e.g. 31/2021/12
+MM_DD_YYYY = 'mmddyyyy'  # e.g. 12/31/2021
+MM_YYYY_DD = 'mmyyyydd'  # e.g. 12/2021/31
+YYYY_MM_DD = 'yyyymmdd'  # e.g. 2021/12/31
+YYYY_DD_MM = 'yyyyddmm'  # e.g. 2021/31/12
 
-D_M_YYYY = 'dmyyyy'
-D_YYYY_M = 'dyyyym'
-M_D_YYYY = 'mdyyyy'
-M_YYYY_D = 'myyyyd'
-YYYY_M_D = 'yyyymd'
-YYYY_D_M = 'yyyydm'
+D_M_YYYY = 'dmyyyy'  # e.g. 1/12/2021
+D_YYYY_M = 'dyyyym'  # e.g. 1/2021/12
+M_D_YYYY = 'mdyyyy'  # e.g. 12/1/2021
+M_YYYY_D = 'myyyyd'  # e.g. 12/1/2021
+YYYY_M_D = 'yyyymd'  # e.g. 2021/12/1
+YYYY_D_M = 'yyyydm'  # e.g. 2021/1/12
 
-DD_MM_YY = 'ddmmyy'
-DD_YY_MM = 'ddyymm'
-MM_DD_YY = 'mmddyy'
-MM_YY_DD = 'mmyyydd'
-YY_MM_DD = 'yymmdd'
-YY_DD_MM = 'yyddmm'
+DD_MM_YY = 'ddmmyy'  # e.g. 01/12/21
+DD_YY_MM = 'ddyymm'  # e.g. 01/21/12
+MM_DD_YY = 'mmddyy'  # e.g. 12/01/21
+MM_YY_DD = 'mmyydd'  # e.g. 12/21/01
+YY_MM_DD = 'yymmdd'  # e.g. 21/12/01
+YY_DD_MM = 'yyddmm'  # e.g. 21/01/12
 
-D_M_YY = 'dmyy'
-D_YY_M = 'dyym'
-M_D_YY = 'mdyy'
-M_YY_D = 'myyd'
-YY_M_D = 'yymd'
-YY_D_M = 'yydm'
+D_M_YY = 'dmyy'  # e.g. 1/12/21
+D_YY_M = 'dyym'  # e.g. 1/21/12
+M_D_YY = 'mdyy'  # e.g. 12/01/21
+M_YY_D = 'myyd'  # e.g. 12/21/1
+YY_M_D = 'yymd'  # e.g. 21/12/1
+YY_D_M = 'yydm'  # e.g. 21/1/12
 
 # Date Formats
-SINGLE = 'single'
-DOUBLE = 'double'
+SINGLE = 'single'  # Single date formats (e.g. dmyy)
+DOUBLE = 'double'  # Double date formats (e.g. ddmmyyyy)
 
 # Different systems to create the hour
-HH_MM = 'hhmm'
-HH_MM_SS = 'hhmmss'
+HH_MM = 'hhmm'  # e.g. 20:11
+HH_MM_SS = 'hhmmss'  # e.g. 20:11:23
 
 # Delimiters
-del_none = ''
-del_comma = ','
-del_hashtag = '#'
-del_colon = ':'
-del_semicolon = ';'
-del_space = ' '
-del_underscore = '_'
-del_dash = '-'
-del_slash = '/'
+del_none = ''  # delimiter none = split text in each character
+del_comma = ','  # delimiter comma = split text in each ,
+del_hashtag = '#'  # delimiter hashtag = split text in each #
+del_colon = ':'  # delimiter colon = split text in each :
+del_semicolon = ';'  # delimiter semicolon = split text in each ;
+del_space = ' '   # delimiter space = split text in each ' '
+del_underscore = '_'  # delimiter underscore = split text in each _
+del_dash = '-'  # delimiter dash = split text in each -
+del_slash = '/'  # delimiter slash = split text in each /
 
-NaN = "nan"
-EMPTY_LIST = []
-EMPTY_DICT = {}
+NaN = "nan"   # a variable to handle 'not a number' values
+EMPTY_LIST = []  # a variable to create empty lists
+EMPTY_DICT = {}  # a variable to create empty dictionaries
 
 merge_min = 'min'
 merge_max = 'max'
