@@ -97,12 +97,12 @@ del_comma = ','  # delimiter comma = split text in each ,
 del_hashtag = '#'  # delimiter hashtag = split text in each #
 del_colon = ':'  # delimiter colon = split text in each :
 del_semicolon = ';'  # delimiter semicolon = split text in each ;
-del_space = ' '   # delimiter space = split text in each ' '
+del_space = ' '  # delimiter space = split text in each ' '
 del_underscore = '_'  # delimiter underscore = split text in each _
 del_dash = '-'  # delimiter dash = split text in each -
 del_slash = '/'  # delimiter slash = split text in each /
 
-NaN = "nan"   # a variable to handle 'not a number' values
+NaN = "nan"  # a variable to handle 'not a number' values
 EMPTY_LIST = []  # a variable to create empty lists
 EMPTY_DICT = {}  # a variable to create empty dictionaries
 
@@ -110,6 +110,7 @@ merge_min = 'min'
 merge_max = 'max'
 merge_mean = 'mean'
 merge_median = 'median'
+
 
 # ------------------------------- #
 # ---------- FUNCTIONS ---------- #
@@ -470,6 +471,7 @@ def change_date_format_from_string(str_date: str, date_format_from: str, date_fo
                                date_format=date_format_to, date_delimiter=date_delimiter_to)
     return new_date
 
+
 # ------------------------------------- #
 # ---------- 3) GENERAL USED ---------- #
 # ------------------------------------- #
@@ -489,51 +491,58 @@ def isLeap(year=dt.datetime.now().year):
         return False  # is not leap
 
 
-def break_date_range_to_periods(date_start, date_end, period_step, date_format, date_delimiter=del_slash, century=21):
+def break_date_range_to_periods(date_start: str, date_end: str, period_step, date_format, date_delimiter=del_slash,
+                                century=21):
+    # Break the start date into day, month and year
     day_start, month_start, year_start = date_break_to_day_month_year(date=date_start, date_format=date_format,
                                                                       date_delimiter=date_delimiter, century=century)
 
-    date_range_list = []
-    curr_day = int(day_start)
-    curr_month = int(month_start)
-    curr_year = int(year_start)
-    while True:
-        next_day = curr_day + period_step
-        next_month = curr_month
-        next_year = curr_year
+    # Break the start date into day, month and year
+    day_end, month_end, year_end = date_break_to_day_month_year(date=date_end, date_format=date_format,
+                                                                date_delimiter=date_delimiter, century=century)
 
-        month_max_date = list_int_month_days_not_leap[curr_month - 1]
-        if isLeap(curr_year):
-            month_max_date = list_int_month_days_leap[curr_month - 1]
+    date_range_list = []  # create an empty list to store the date ranges
+    dt_current_date = dt.date(int(year_start), int(month_start), int(day_start))
+    dt_end_date = dt.date(int(year_end), int(month_end), int(day_end))
 
-        if next_day > month_max_date:
-            next_day = next_day % month_max_date
-            next_month += 1
-            if next_month > 12:
-                next_month = next_month % 12
-                next_year += 1
+    format_end_date = change_date_format_from_string(str_date=dt_end_date.strftime('%d/%m/%Y'),
+                                                     date_format_from=DD_MM_YYYY,
+                                                     date_format_to=date_format,
+                                                     date_delimiter_from=del_slash,
+                                                     date_delimiter_to=date_delimiter, century=21)
 
-        curr_date = set_date_format(day=str(curr_day), month=str(curr_month), year=str(curr_year),
-                                    date_format=date_format, date_delimiter=date_delimiter)
-        next_date = set_date_format(day=str(next_day), month=str(next_month), year=str(next_year),
-                                    date_format=date_format, date_delimiter=date_delimiter)
+    if period_step == 0:
+        format_current_date = change_date_format_from_string(str_date=dt_current_date.strftime('%d/%m/%Y'),
+                                                             date_format_from=DD_MM_YYYY,
+                                                             date_format_to=date_format,
+                                                             date_delimiter_from=del_slash,
+                                                             date_delimiter_to=date_delimiter, century=century)
+        date_range_list.append([format_current_date, format_end_date])
+        return date_range_list
+    else:
+        period_step -= 1
+        while True:
+            dt_next_date = dt_current_date + dt.timedelta(days=period_step)
 
-        if next_date > date_end:
-            break
-        date_range_list.append([curr_date, next_date])
+            format_current_date = change_date_format_from_string(str_date=dt_current_date.strftime('%d/%m/%Y'),
+                                                                 date_format_from=DD_MM_YYYY,
+                                                                 date_format_to=date_format,
+                                                                 date_delimiter_from=del_slash,
+                                                                 date_delimiter_to=date_delimiter, century=century)
 
-        curr_day = next_day + 1
-        curr_month = next_month
-        curr_year = next_year
+            format_next_date = change_date_format_from_string(str_date=dt_next_date.strftime('%d/%m/%Y'),
+                                                              date_format_from=DD_MM_YYYY,
+                                                              date_format_to=date_format,
+                                                              date_delimiter_from=del_slash,
+                                                              date_delimiter_to=date_delimiter, century=century)
 
-        if curr_day > month_max_date:
-            curr_day = curr_day % month_max_date
-            curr_month += 1
-            if curr_month > 12:
-                curr_month = next_month % 12
-                curr_year += 1
+            if dt_next_date > dt_end_date:
+                date_range_list.append([format_current_date, format_end_date])
+                break
+            date_range_list.append([format_current_date, format_next_date])
+            dt_current_date = dt_next_date + dt.timedelta(days=1)
 
-    return date_range_list
+        return date_range_list
 
 
 def create_string_list_date_range(list_input: [], del_input=del_slash, del_output=del_slash):
