@@ -1,4 +1,5 @@
 import lib.my_calendar_v2 as cal_v2
+import pandas as pd
 
 
 def test_temperature_dataset():
@@ -12,56 +13,82 @@ def test_temperature_dataset():
     dataset_event_names = ['Temperature']
 
     # Read the temperatures_data
-    path_Athens_2020 = 'data/temperatures_dataset/Past/Athens.csv'
-    path_Brest_2020 = 'data/temperatures_dataset/Past/Brest.csv'
-    path_Madrid_2020 = 'data/temperatures_dataset/Past/Madrid.csv'
-    path_Vienna_2020 = 'data/temperatures_dataset/Past/Vienna.csv'
+    path_Athens = 'data/temperatures_dataset/Current/Athens2021_from_1_to_4.csv'
+    path_Brest = 'data/temperatures_dataset/Current/Brest2021_from_1_to_4.csv'
+    path_Madrid = 'data/temperatures_dataset/Current/Madrid2021_from_1_to_4.csv'
+    path_Vienna = 'data/temperatures_dataset/Current/Vienna2021_from_1_to_4.csv'
 
-    list_Athens_2020 = cal_v2.read_csv(path_Athens_2020)
-    list_Brest_2020 = cal_v2.read_csv(path_Brest_2020)
-    list_Madrid_2020 = cal_v2.read_csv(path_Madrid_2020)
-    list_Vienna_2020 = cal_v2.read_csv(path_Vienna_2020)
+    list_Athens = cal_v2.read_csv(path_Athens)
+    list_Brest = cal_v2.read_csv(path_Brest)
+    list_Madrid = cal_v2.read_csv(path_Madrid)
+    list_Vienna = cal_v2.read_csv(path_Vienna)
 
     # Calendar Creation for the year of 2020 and add default event values
-    temp_cal_2020 = cal_v2.MyCalendar(list_of_years=[2019, 2020], is_time=True, date_format=cal_v2.MM_DD_YYYY,
-                                      date_delimiter=cal_v2.del_slash, time_format=cal_v2.HH_MM,
-                                      time_delimiter=cal_v2.del_colon, hour_start=0, hour_end=24, hour_step=1,
-                                      minute_start=0, minute_end=60, minute_step=0)
+    temp_cal = cal_v2.MyCalendar(list_of_years=[2020, 2021], is_time=True, date_format=cal_v2.MM_DD_YYYY,
+                                 date_delimiter=cal_v2.del_slash, time_format=cal_v2.HH_MM,
+                                 time_delimiter=cal_v2.del_colon, hour_start=0, hour_end=24, hour_step=1,
+                                 minute_start=0, minute_end=60, minute_step=0)
+
+    # Change the Athens_2020 date format to be the same as calendar's.
+    list_Athens = cal_v2.change_date_format_in_list(list_event=list_Athens,
+                                                    date_index=0,
+                                                    date_format_from=cal_v2.MM_DD_YYYY,
+                                                    date_format_to=cal_v2.MM_DD_YYYY,
+                                                    date_delimiter_from=cal_v2.del_slash,
+                                                    date_delimiter_to=cal_v2.del_slash,
+                                                    century=21)
 
     # Change the Brest_2020 date format to be the same as calendar's.
-    list_Brest_2020 = cal_v2.change_date_format_in_list(list_event=list_Brest_2020,
-                                                        date_index=0,
-                                                        date_format_from=cal_v2.MM_DD_YYYY,
-                                                        date_format_to=cal_v2.MM_DD_YYYY,
-                                                        date_delimiter_from=cal_v2.del_slash,
-                                                        date_delimiter_to=cal_v2.del_slash,
-                                                        century=21)
+    list_Brest = cal_v2.change_date_format_in_list(list_event=list_Brest,
+                                                   date_index=0,
+                                                   date_format_from=cal_v2.MM_DD_YYYY,
+                                                   date_format_to=cal_v2.MM_DD_YYYY,
+                                                   date_delimiter_from=cal_v2.del_slash,
+                                                   date_delimiter_to=cal_v2.del_slash,
+                                                   century=21)
 
-    # Change the Brest_2020 date format to be the same as calendar's.
-    list_Athens_2020 = cal_v2.change_date_format_in_list(list_event=list_Athens_2020,
-                                                         date_index=0,
-                                                         date_format_from=cal_v2.MM_DD_YYYY,
-                                                         date_format_to=cal_v2.MM_DD_YYYY,
-                                                         date_delimiter_from=cal_v2.del_slash,
-                                                         date_delimiter_to=cal_v2.del_slash,
-                                                         century=21)
+    # Change the Madrid_2020 date format to be the same as calendar's.
+    list_Madrid = cal_v2.change_date_format_in_list(list_event=list_Madrid,
+                                                    date_index=0,
+                                                    date_format_from=cal_v2.MM_DD_YYYY,
+                                                    date_format_to=cal_v2.MM_DD_YYYY,
+                                                    date_delimiter_from=cal_v2.del_slash,
+                                                    date_delimiter_to=cal_v2.del_slash,
+                                                    century=21)
 
-    temp_cal_2020.add_list_key_event_to_calendar(list_key_event=dataset_event_names, list_of_headers=final_csv_header)
-    temp_cal_2020.add_events_to_calendar(list_of_events=list_Athens_2020, date_index=0, time_index=1,
-                                         first_row_header=False, list_of_headers=Athens_csv_header, event_index=0,
-                                         input_event_name=dataset_event_names[0])  # 1
-    temp_cal_2020.add_events_to_calendar(list_of_events=list_Brest_2020, date_index=0, time_index=1,
-                                         first_row_header=False, list_of_headers=Brest_csv_header, event_index=0,
-                                         input_event_name=dataset_event_names[0])  # 2
-    temp_cal_2020.add_events_to_calendar(list_of_events=list_Madrid_2020, date_index=0, time_index=1,
-                                         first_row_header=False, list_of_headers=Madrid_csv_header, event_index=0,
-                                         input_event_name=dataset_event_names[0])  # 3
-    temp_cal_2020.add_events_to_calendar(list_of_events=list_Vienna_2020, date_index=0, time_index=1,
-                                         first_row_header=False, list_of_headers=Vienna_csv_header, event_index=0,
-                                         input_event_name=dataset_event_names[0])  # 4
+    # Change the Madrid_2020 date format to be the same as calendar's.
+    list_Vienna = cal_v2.change_date_format_in_list(list_event=list_Vienna,
+                                                    date_index=0,
+                                                    date_format_from=cal_v2.MM_DD_YYYY,
+                                                    date_format_to=cal_v2.MM_DD_YYYY,
+                                                    date_delimiter_from=cal_v2.del_slash,
+                                                    date_delimiter_to=cal_v2.del_slash,
+                                                    century=21)
+
+    temp_cal.add_list_key_event_to_calendar(list_key_event=dataset_event_names, list_of_headers=final_csv_header)
+    temp_cal.add_events_to_calendar(list_of_events=list_Athens, date_index=0, time_index=1,
+                                    first_row_header=False, list_of_headers=Athens_csv_header, event_index=0,
+                                    input_event_name=dataset_event_names[0])  # 1
+    temp_cal.add_events_to_calendar(list_of_events=list_Brest, date_index=0, time_index=1,
+                                    first_row_header=False, list_of_headers=Brest_csv_header, event_index=0,
+                                    input_event_name=dataset_event_names[0])  # 2
+    temp_cal.add_events_to_calendar(list_of_events=list_Madrid, date_index=0, time_index=1,
+                                    first_row_header=False, list_of_headers=Madrid_csv_header, event_index=0,
+                                    input_event_name=dataset_event_names[0])  # 3
+    temp_cal.add_events_to_calendar(list_of_events=list_Vienna, date_index=0, time_index=1,
+                                    first_row_header=False, list_of_headers=Vienna_csv_header, event_index=0,
+                                    input_event_name=dataset_event_names[0])  # 4
     # temp_cal_2020.print()
-    list_temperatures = temp_cal_2020.dict_to_list(['01/01/2020', '30/04/2020'])
-    cal_v2.write_csv(csv_path="export_folder/temperatures_2020.csv",
+    list_temperatures = temp_cal.dict_to_list(['01/01/2021', '30/04/2021'])
+    list_temperatures = pd.DataFrame(list_temperatures)
+    # list_temperatures = list_temperatures.T
+    list_temperatures.fillna(method='bfill', inplace=True)
+    list_temperatures.fillna(method='ffill', inplace=True)
+    # list_temperatures = list_temperatures.T
+    list_temperatures = list_temperatures.values.tolist()
+    # print(list_temperatures)
+
+    cal_v2.write_csv(csv_path="export_folder/temperatures_2021.csv",
                      list_write=list_temperatures, delimiter=cal_v2.del_comma)
 
 

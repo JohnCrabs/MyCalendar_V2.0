@@ -20,6 +20,7 @@ Let's say we need to export it to excel:
 
 import datetime as dt
 import warnings
+import numpy as np
 
 # Create lists that corresponds to date, time strings
 # Create list for months
@@ -38,9 +39,12 @@ list_str_id_days_dd = ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10
                        '13', '14', '15', '16', '17', '18', '19', '20', '21', '22', '23', '24',
                        '25', '26', '27', '28', '29', '30', '31']
 
-# Create list for hours
-list_str_id_hours = ['00', '01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11',
-                     '12', '13', '14', '15', '16', '17', '18', '19', '20', '21', '22', '23']
+# Create lists for hours
+list_str_id_hours_double = ['00', '01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11',
+                            '12', '13', '14', '15', '16', '17', '18', '19', '20', '21', '22', '23']
+
+list_str_id_hours_single = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11',
+                            '12', '13', '14', '15', '16', '17', '18', '19', '20', '21', '22', '23']
 
 # Create list for minutes
 list_str_id_minutes = ['00', '01', '02', '03', '04', '05', '06', '07', '08', '09',
@@ -88,8 +92,9 @@ SINGLE = 'single'  # Single date formats (e.g. dmyy)
 DOUBLE = 'double'  # Double date formats (e.g. ddmmyyyy)
 
 # Different systems to create the hour
-HH_MM = 'hhmm'  # e.g. 20:11
-HH_MM_SS = 'hhmmss'  # e.g. 20:11:23
+H_MM = 'hmm'  # e.g. 9:05
+HH_MM = 'hhmm'  # e.g. 09:05
+HH_MM_SS = 'hhmmss'  # e.g. 09:05:23
 
 # Delimiters
 del_none = ''  # delimiter none = split text in each character
@@ -102,7 +107,7 @@ del_underscore = '_'  # delimiter underscore = split text in each _
 del_dash = '-'  # delimiter dash = split text in each -
 del_slash = '/'  # delimiter slash = split text in each /
 
-NaN = "nan"  # a variable to handle 'not a number' values
+NaN = np.nan  # a variable to handle 'not a number' values
 EMPTY_LIST = []  # a variable to create empty lists
 EMPTY_DICT = {}  # a variable to create empty dictionaries
 
@@ -195,7 +200,7 @@ def set_time(hour_start=0, hour_end=24, hour_step=1, minute_start=0, minute_end=
         for hour in range(hour_start, hour_end, hour_step):
             if minute_step == 0:  # if minute_step is 0
                 # Create a timestamp_tmp
-                timestamp_tmp = list_str_id_hours[hour] + delimiter
+                timestamp_tmp = list_str_id_hours_double[hour] + delimiter
                 timestamp_tmp += list_str_id_minutes[0]
                 list_timestamp.append(timestamp_tmp)  # append to list_timestamp
                 int_size += 1
@@ -203,7 +208,7 @@ def set_time(hour_start=0, hour_end=24, hour_step=1, minute_start=0, minute_end=
             else:
                 for minutes in range(minute_start, minute_end, minute_step):
                     # Create a timestamp_tmp
-                    timestamp_tmp = list_str_id_hours[hour] + delimiter
+                    timestamp_tmp = list_str_id_hours_double[hour] + delimiter
                     timestamp_tmp += list_str_id_minutes[minutes]
                     list_timestamp.append(timestamp_tmp)  # append to list_timestamp
                     int_size += 1
@@ -300,12 +305,13 @@ def date_break_to_day_month_year(date: str, date_format: str, date_delimiter=del
 
 def change_hour_number_list_to_time(list_hour: [], time_format=HH_MM):
     list_hour_tmp = []  # create tmp hour list
-    if time_format == HH_MM:
+    if time_format == HH_MM or time_format == H_MM:
         for hour in list_hour:
             list_hour_tmp.append('%02i' % int(hour) + ':00')
     elif time_format == HH_MM_SS:
         for hour in list_hour:
             list_hour_tmp.append('%02i' % int(hour) + ':00:00')
+
     return list_hour_tmp
 
 
@@ -466,6 +472,18 @@ def change_date_format_from_string(str_date: str, date_format_from: str, date_fo
                                date_format=date_format_to, date_delimiter=date_delimiter_to)
     return new_date
 
+
+def str_time_norm(str_time: str, time_format=HH_MM):
+    if time_format == HH_MM or time_format == H_MM:
+        hours, minutes = str_time.split(':')
+        export_time = '%02i' % int(hours) + ":" + minutes
+    elif time_format == HH_MM_SS:
+        hours, minutes, seconds = str_time.split(':')
+        export_time = '%02i' % int(hours) + ":" + minutes + ":" + seconds
+    else:
+        hours, minutes, seconds = str_time.split(':')
+        export_time = '%02i' % int(hours) + ":" + minutes
+    return export_time
 
 # ------------------------------------- #
 # ---------- 3) GENERAL USED ---------- #
@@ -663,7 +681,7 @@ class MyCalendar:
         :return: list_hour
         """
         list_hour_tmp = []
-        if self.time_format == HH_MM:
+        if self.time_format == HH_MM or self.time_format == H_MM:
             for event in list_event:
                 event[time_index] = '%02i' % int(event[time_index]) + ':00'
                 list_hour_tmp.append(event)
@@ -671,7 +689,6 @@ class MyCalendar:
             for event in list_event:
                 event[time_index] = '%02i' % int(event[time_index]) + ':00'
                 list_hour_tmp.append(event)
-        return list_hour_tmp
 
     def change_date_format_in_a_cal_list(self, list_event: [], date_index, date_format_from: str,
                                          date_delimiter_from=del_slash, century=21):
@@ -780,7 +797,7 @@ class MyCalendar:
         for i in range(start_index, len(list_of_events)):
             date = list_of_events[i][date_index]
             if self.is_time:
-                time = list_of_events[i][time_index]
+                time =  str_time_norm(list_of_events[i][time_index])
                 if first_row_header:
                     event_name = list_of_events[i][event_index]
                     if event_name not in self.event_names:
@@ -802,6 +819,7 @@ class MyCalendar:
                         if header_name not in self.header_names:
                             self.header_names.append(header_name)
                         if event_name not in self.dict_calendar[date][time].keys():
+                            print(time)
                             self.dict_calendar[date][time][event_name] = {}
                         if list_of_events[i][j] is '':
                             self.dict_calendar[date][time][event_name][header_name] = no_data_value
