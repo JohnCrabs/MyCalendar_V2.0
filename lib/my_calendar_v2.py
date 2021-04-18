@@ -264,42 +264,38 @@ def date_break_to_day_month_year(date: str, date_format: str, date_delimiter=del
             :param date_delimiter: The delimiter of the date.
             :return: day: str, month: str, year: str
             """
+    day, month, year = None, None, None
     # DD_MM_YYYY or D_M_YYYY or DD_MM_YY or D_M_YY
     if date_format == DD_MM_YYYY or date_format == D_M_YYYY or date_format == DD_MM_YY or date_format == D_M_YY:
         day, month, year = date.split(date_delimiter)  # split the date using the delimiter
-        if date_format == DD_MM_YY or date_format == D_M_YY:
+        if len(year) < 4 and (date_format == DD_MM_YY or date_format == D_M_YY):
             year = str(int(year) + (century - 1) * 100)
-        return day, month, year
     # DD_YYYY_MM or D_YYYY_M or DD_YY_MM or D_YY_M
     elif date_format == DD_YYYY_MM or date_format == D_YYYY_M or date_format == DD_YY_MM or date_format == D_YY_M:
         day, year, month = date.split(date_delimiter)  # split the date using the delimiter
-        if date_format == DD_YY_MM or date_format == D_YY_M:
+        if len(year) < 4 and (date_format == DD_YY_MM or date_format == D_YY_M):
             year = str(int(year) + (century - 1) * 100)
-        return day, month, year
     # MM_DD_YYYY or M_D_YYYY or MM_DD_YY or M_D_YY
     elif date_format == MM_DD_YYYY or date_format == M_D_YYYY or date_format == MM_DD_YY or date_format == M_D_YY:
         month, day, year = date.split(date_delimiter)  # split the date using the delimiter
-        if date_format == MM_DD_YY or date_format == M_D_YY:
+        if len(year) < 4 and (date_format == MM_DD_YY or date_format == M_D_YY):
             year = str(int(year) + (century - 1) * 100)
-        return day, month, year
     # MM_YYYY_DD or M_YYYY_D or MM_YY_DD or M_YY_D
     elif date_format == MM_YYYY_DD or date_format == M_YYYY_D or date_format == MM_YY_DD or date_format == M_YY_D:
         month, year, day = date.split(date_delimiter)  # split the date using the delimiter
-        if date_format == MM_YY_DD or date_format == M_YY_D:
+        if len(year) < 4 and (date_format == MM_YY_DD or date_format == M_YY_D):
             year = str(int(year) + (century - 1) * 100)
-        return day, month, year
     # YYYY_MM_DD or YYYY_M_D or YY_MM_DD or YY_M_D
     elif date_format == YYYY_MM_DD or date_format == YYYY_M_D or date_format == YY_MM_DD or date_format == YY_M_D:
         year, month, day = date.split(date_delimiter)  # split the date using the delimiter
-        if date_format == YY_MM_DD or date_format == YY_M_D:
+        if len(year) < 4 and (date_format == YY_MM_DD or date_format == YY_M_D):
             year = str(int(year) + (century - 1) * 100)
-        return day, month, year
     # YYYY_DD_MM or YYYY_D_M or YY_DD_MM or YY_D_M
     elif date_format == YYYY_DD_MM or date_format == YYYY_D_M or date_format == YY_DD_MM or date_format == YY_D_M:
         year, day, month = date.split(date_delimiter)  # split the date using the delimiter
-        if date_format == YY_DD_MM or date_format == YY_D_M:
+        if len(year) < 4 and (date_format == YY_DD_MM or date_format == YY_D_M):
             year = str(int(year) + (century - 1) * 100)
-        return day, month, year
+    return day, month, year
 
 
 def change_hour_number_list_to_time(list_hour: [], time_format=HH_MM):
@@ -454,7 +450,6 @@ def change_date_format_in_list(list_event: [], date_index, date_format_from: str
     for event in list_event:  # parsing all events in list
         day, month, year = date_break_to_day_month_year(date=event[date_index], date_format=date_format_from,
                                                         date_delimiter=date_delimiter_from, century=century)
-
         date_tmp = set_date_format(day=day, month=month, year=year,
                                    date_format=date_format_to, date_delimiter=date_delimiter_to)
         event[date_index] = date_tmp
