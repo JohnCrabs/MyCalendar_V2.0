@@ -91,7 +91,6 @@ def test_temperature_dataset():
     cal_v2.write_csv(csv_path="export_folder/temperatures_2021.csv",
                      list_write=list_temperatures, delimiter=cal_v2.del_comma)
 
-
 def test_covid_dataset():
     str_changes_visitors_path = 'data/covid_dataset/changes-visitors-covid.csv'
     str_covid_19_testing_policy_path = 'data/covid_dataset/covid-19-testing-policy.csv'
@@ -241,8 +240,125 @@ def test_covid_dataset():
     list_calendar = covid_calendar.dict_to_list(date_range=['2020-01-01', '2021-01-08'])
     cal_v2.write_csv(csv_path="export_folder/covid_measures.csv", list_write=list_calendar, delimiter=cal_v2.del_comma)
 
-    # covid_calendar.print(1)
+
+def test_covid_dataset_2021():
+    str_covid_dt_2021_00_covid_stringency_index_path = 'data/covid_dataset_2021/00_covid-stringency-index.csv'
+    str_covid_dt_2021_01_school_closures_path = 'data/covid_dataset_2021/01_school-closures-covid.csv'
+    str_covid_dt_2021_02_workplace_closures_path = 'data/covid_dataset_2021/02_workplace-closures-covid.csv'
+    str_covid_dt_2021_03_public_events_path = 'data/covid_dataset_2021/03_public-events-covid.csv'
+    str_covid_dt_2021_04_public_gathering_rules_path = 'data/covid_dataset_2021/04_public-gathering-rules-covid.csv'
+    str_covid_dt_2021_05_stay_at_home_path = 'data/covid_dataset_2021/05_stay-at-home-covid.csv'
+    str_covid_dt_2021_06_international_travel_path = 'data/covid_dataset_2021/06_international-travel-covid.csv'
+    str_covid_dt_2021_07_internal_movement_path = 'data/covid_dataset_2021/07_internal-movement-covid.csv'
+    str_covid_dt_2021_08_public_transport_path = 'data/covid_dataset_2021/08_public-transport-covid.csv'
+    str_covid_dt_2021_09_international_travel_path = 'data/covid_dataset_2021/09_international-travel-covid.csv'
+    str_covid_dt_2021_10_owid_covid_path = 'data/covid_dataset_2021/10_owid-covid-data.csv'
+
+    list_covid_dt_2021_00 = cal_v2.read_csv(csv_path=str_covid_dt_2021_00_covid_stringency_index_path,
+                                            delimiter=cal_v2.del_comma)
+    list_covid_dt_2021_01 = cal_v2.read_csv(csv_path=str_covid_dt_2021_01_school_closures_path,
+                                            delimiter=cal_v2.del_comma)
+    list_covid_dt_2021_02 = cal_v2.read_csv(csv_path=str_covid_dt_2021_02_workplace_closures_path,
+                                            delimiter=cal_v2.del_comma)
+    list_covid_dt_2021_03 = cal_v2.read_csv(csv_path=str_covid_dt_2021_03_public_events_path,
+                                            delimiter=cal_v2.del_comma)
+    list_covid_dt_2021_04 = cal_v2.read_csv(csv_path=str_covid_dt_2021_04_public_gathering_rules_path,
+                                            delimiter=cal_v2.del_comma)
+    list_covid_dt_2021_05 = cal_v2.read_csv(csv_path=str_covid_dt_2021_05_stay_at_home_path,
+                                            delimiter=cal_v2.del_comma)
+    list_covid_dt_2021_06 = cal_v2.read_csv(csv_path=str_covid_dt_2021_06_international_travel_path,
+                                            delimiter=cal_v2.del_comma)
+    list_covid_dt_2021_07 = cal_v2.read_csv(csv_path=str_covid_dt_2021_07_internal_movement_path,
+                                            delimiter=cal_v2.del_comma)
+    list_covid_dt_2021_08 = cal_v2.read_csv(csv_path=str_covid_dt_2021_08_public_transport_path,
+                                            delimiter=cal_v2.del_comma)
+    list_covid_dt_2021_09 = cal_v2.read_csv(csv_path=str_covid_dt_2021_09_international_travel_path,
+                                            delimiter=cal_v2.del_comma)
+    list_covid_dt_2021_10 = cal_v2.read_csv(csv_path=str_covid_dt_2021_10_owid_covid_path,
+                                            delimiter=cal_v2.del_comma)
+
+    # print(list_covid_dt_2021_10)
+
+    list_countries = []
+    dict_of_event_type = []
+
+    def set_list_countries(list_input, country_index=0):
+        for event_name in list_input[0]:
+            if event_name not in dict_of_event_type:
+                dict_of_event_type.append(event_name)
+        for i in range(1, len(list_input)):
+            if list_input[i][country_index] not in list_countries:
+                list_countries.append(list_input[i][country_index])
+                # print(list_input[i][country_index])
+
+    set_list_countries(list_covid_dt_2021_00)
+    set_list_countries(list_covid_dt_2021_01)
+    set_list_countries(list_covid_dt_2021_02)
+    set_list_countries(list_covid_dt_2021_03)
+    set_list_countries(list_covid_dt_2021_04)
+    set_list_countries(list_covid_dt_2021_05)
+    set_list_countries(list_covid_dt_2021_06)
+    set_list_countries(list_covid_dt_2021_07)
+    set_list_countries(list_covid_dt_2021_08)
+    set_list_countries(list_covid_dt_2021_09)
+    set_list_countries(list_covid_dt_2021_10)
+    list_countries.sort()
+
+    # print(list_countries.__len__())
+    # print(dict_of_event_type)
+
+    covid_calendar = cal_v2.MyCalendar(list_of_years=[2020, 2021], is_time=False, date_format=cal_v2.YYYY_MM_DD,
+                                       date_delimiter=cal_v2.del_dash, time_format=cal_v2.HH_MM,
+                                       time_delimiter=cal_v2.del_colon, hour_start=0, hour_end=0, hour_step=1,
+                                       minute_start=0, minute_end=0, minute_step=0)
+    covid_calendar.add_list_key_event_to_calendar(list_key_event=list_countries)
+    covid_calendar.add_list_key_event_to_calendar(list_key_event=list_countries, list_of_headers=dict_of_event_type)
+
+    covid_calendar.add_events_to_calendar(list_of_events=list_covid_dt_2021_00, date_index=2,
+                                          time_index=None,
+                                          first_row_header=True, list_of_headers=None, event_index=0)
+    covid_calendar.add_events_to_calendar(list_of_events=list_covid_dt_2021_01, date_index=2,
+                                          time_index=None,
+                                          first_row_header=True, list_of_headers=None, event_index=0)
+    covid_calendar.add_events_to_calendar(list_of_events=list_covid_dt_2021_02, date_index=2,
+                                          time_index=None,
+                                          first_row_header=True, list_of_headers=None, event_index=0)
+    covid_calendar.add_events_to_calendar(list_of_events=list_covid_dt_2021_03, date_index=2,
+                                          time_index=None,
+                                          first_row_header=True, list_of_headers=None, event_index=0)
+    covid_calendar.add_events_to_calendar(list_of_events=list_covid_dt_2021_04, date_index=2,
+                                          time_index=None,
+                                          first_row_header=True, list_of_headers=None, event_index=0)
+    covid_calendar.add_events_to_calendar(list_of_events=list_covid_dt_2021_05, date_index=2,
+                                          time_index=None,
+                                          first_row_header=True, list_of_headers=None, event_index=0)
+    covid_calendar.add_events_to_calendar(list_of_events=list_covid_dt_2021_06, date_index=2,
+                                          time_index=None,
+                                          first_row_header=True, list_of_headers=None, event_index=0)
+    covid_calendar.add_events_to_calendar(list_of_events=list_covid_dt_2021_07, date_index=2,
+                                          time_index=None,
+                                          first_row_header=True, list_of_headers=None, event_index=0)
+    covid_calendar.add_events_to_calendar(list_of_events=list_covid_dt_2021_08, date_index=2,
+                                          time_index=None,
+                                          first_row_header=True, list_of_headers=None, event_index=0)
+    covid_calendar.add_events_to_calendar(list_of_events=list_covid_dt_2021_09, date_index=2,
+                                          time_index=None,
+                                          first_row_header=True, list_of_headers=None, event_index=0)
+    covid_calendar.add_events_to_calendar(list_of_events=list_covid_dt_2021_10, date_index=2,
+                                          time_index=None,
+                                          first_row_header=True, list_of_headers=None, event_index=0)
+
+    list_calendar = covid_calendar.dict_to_list(date_range=['2020-04-01', '2020-11-30'])
+    cal_v2.write_csv(csv_path="export_folder/covid_measures_2020_April_to_November.csv",
+                     list_write=list_calendar, delimiter=cal_v2.del_comma)
+
+    list_calendar = covid_calendar.dict_to_list(date_range=['2020-01-01', '2020-05-23'])
+    cal_v2.write_csv(csv_path="export_folder/covid_measures_2021.csv",
+                     list_write=list_calendar, delimiter=cal_v2.del_comma)
+
+    # covid_calendar.print()
 
 
-test_temperature_dataset()
+# test_temperature_dataset()
 # test_covid_dataset()
+test_covid_dataset_2021()

@@ -929,11 +929,19 @@ class MyCalendar:
                             for header in self.dict_calendar[date][event].keys():
                                 if header not in header_list_tmp:
                                     header_list_tmp.append(header)
-                                tmp_list.append(self.dict_calendar[date][event][header])
+                                if date_range is None:
+                                    tmp_list.append(self.dict_calendar[date][event][header])
+                                else:
+                                    if date_range[0] == date or is_data_in_range:
+                                        is_data_in_range = True
+                                        tmp_list.append(self.dict_calendar[date][event][header])
+                                        if date_range[1] == date:
+                                            is_data_in_range = False
                             if append_header:
                                 output_list.append(header_list_tmp)
                                 append_header = False
-                            output_list.append(tmp_list)
+                            if tmp_list and can_append:
+                                output_list.append(tmp_list)
                         else:
                             tmp_list = []
                             for event_name in self.dict_calendar[date]:
@@ -951,7 +959,8 @@ class MyCalendar:
                             if append_header:
                                 output_list.append(header_list_tmp)
                                 append_header = False
-                            output_list.append(tmp_list)
+                            if tmp_list and can_append:
+                                output_list.append(tmp_list)
                     else:
                         pass
         return output_list
